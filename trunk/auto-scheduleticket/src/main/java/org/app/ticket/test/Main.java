@@ -34,7 +34,7 @@ public class Main {
 
 		// TODO 获取火车票数量
 		List<UserInfo> userInfos = new ArrayList<UserInfo>();
-		UserInfo userInfo = new UserInfo("430703199012266454", "杨杰", "13714389492");
+		UserInfo userInfo = new UserInfo("430703199012266454", "杨杰", "13714389491");
 		userInfos.add(userInfo);
 		
 		// 获取火车票数量
