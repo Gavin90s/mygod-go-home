@@ -142,7 +142,6 @@ public class MainWin {
 		label_o.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		username = new JTextField();
-		username.setText("hncdyj");
 		username.setToolTipText(ResManager.getString("RobotTicket.label.user_name"));
 		username.setBounds(60, 23, 100, 21);
 		panel_o.add(username);
@@ -154,7 +153,6 @@ public class MainWin {
 		label_o1.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		password = new JPasswordField();
-		password.setText("yangjie123");
 		password.setToolTipText(ResManager.getString("RobotTicket.label.password"));
 		password.setBounds(220, 23, 100, 21);
 		panel_o.add(password);
@@ -485,7 +483,7 @@ public class MainWin {
 	public String initLoginImage() {
 		String url = "";
 		try {
-			url = path + File.separator + "image" + File.separator;
+			url = path + "image" + File.separator;
 			File file = new File(url);
 			if (!file.exists()) {
 				file.mkdirs();
