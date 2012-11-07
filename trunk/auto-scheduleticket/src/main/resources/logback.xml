@@ -71,7 +71,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="auto" additivity="false">
+	<logger name="ticket" additivity="false">
 		<appender-ref ref="debug" />
 		<appender-ref ref="info" />
 		<appender-ref ref="error" />

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.app.ticket.bean.TrainQueryInfo;
+import org.app.ticket.bean.UserInfo;
 import org.app.ticket.constants.Constants;
 import org.app.ticket.core.MainWin;
 import org.app.ticket.msg.ResManager;
@@ -13,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 自动火车火车相关信息
+ * 自动选择火车相关信息
  * 
  * @Title: AutoGetTrainInfo.java
  * @Description: org.app.ticket.logic
@@ -25,10 +26,16 @@ import org.slf4j.LoggerFactory;
  */
 public class AutoGetTrainInfo {
 	private static final Logger logger = LoggerFactory.getLogger(AutoGetTrainInfo.class);
-
+	// 存放列车信息
 	private List<TrainQueryInfo> trainQueryInfoList;
-
+	// 存放用户信息
+	private List<UserInfo> userInfoList;
+	// 主界面
 	private MainWin mainWin;
+	// 存放指定的列车
+	private String[] specificTrainKeys;
+
+	private String[] specificTrainSeat;
 
 	/** 指定的车 */
 	private Map<String, TrainQueryInfo> specificTrains = new HashMap<String, TrainQueryInfo>();
@@ -39,9 +46,15 @@ public class AutoGetTrainInfo {
 
 	}
 
-	public AutoGetTrainInfo(List<TrainQueryInfo> trainQueryInfoList, MainWin mainWin) {
+	public AutoGetTrainInfo(List<TrainQueryInfo> trainQueryInfoList, MainWin mainWin, List<UserInfo> userInfoList) {
 		this.trainQueryInfoList = trainQueryInfoList;
 		this.mainWin = mainWin;
+		this.userInfoList = userInfoList;
+		// 获取指定的列车
+		specificTrainKeys = getKeys();
+		// 获取指定的座位席别
+		specificTrainSeat = getSeatKeys();
+		trainQueryInfoClass();
 	}
 
 	/**
@@ -49,24 +62,37 @@ public class AutoGetTrainInfo {
 	 * 
 	 */
 	public void trainQueryInfoClass() {
-		String[] keys = getKeys();
-		for (int j = 0; j < keys.length; j++) {
-			if (StringUtil.isEmptyString(keys[j])) {
+		for (int j = 0; j < specificTrainKeys.length; j++) {
+			if (StringUtil.isEmptyString(specificTrainKeys[j])) {
 				break;
 			}
 			for (int i = trainQueryInfoList.size() - 1; i >= 0; i--) {
-				if (keys[j].equals(trainQueryInfoList.get(i).getTrainNo())) {
+				if (specificTrainKeys[j].equals(trainQueryInfoList.get(i).getTrainNo())) {
 					// 存放指定的车
 					specificTrains.put(trainQueryInfoList.get(i).getTrainCode(), trainQueryInfoList.get(i));
 					logger.debug("指定车次为:" + trainQueryInfoList.get(i).getTrainNo());
 					trainQueryInfoList.remove(i);
 				}
+				// 获取指定车之外有票的列车
 				if (!StringUtil.isEmptyString(trainQueryInfoList.get(i).getMmStr())) {
 					specificSeatTrains.put(trainQueryInfoList.get(i).getTrainCode(), trainQueryInfoList.get(i));
 				}
 			}
 		}
-		System.out.println(1);
+		String specificTrain = "";
+		for (Map.Entry<String, TrainQueryInfo> key : specificTrains.entrySet()) {
+			specificTrain += key.getKey() + ",";
+		}
+		String specificSeatTrain = "";
+		for (Map.Entry<String, TrainQueryInfo> key : specificSeatTrains.entrySet()) {
+			specificSeatTrain += key.getKey() + ",";
+		}
+		if (!StringUtil.isEmptyString(specificTrain)) {
+			logger.debug("指定列车信息:" + specificTrain.substring(0, specificTrain.length() - 1));
+		}
+		if (!StringUtil.isEmptyString(specificSeatTrain)) {
+			logger.debug("指定之外列车信息:" + specificTrain.substring(0, specificTrain.length() - 1));
+		}
 	}
 
 	/**
@@ -75,28 +101,27 @@ public class AutoGetTrainInfo {
 	 * @return TrainQueryInfo
 	 */
 	public TrainQueryInfo getSeattrainQueryInfo() {
-		String[] keys = getKeys();
 		boolean isAssign = false;
 		TrainQueryInfo returninfo = null;
-		if (keys.length > 0) {
-			for (int i = 0; i < keys.length; i++) {
-				if (StringUtil.isEmptyString(keys[i])) {
-					break;
-				}
-				TrainQueryInfo info = specificTrains.get(keys[i]);
+		// 指定了车次
+		if (specificTrainKeys.length > 0) {
+			for (int i = 0; i < specificTrainKeys.length; i++) {
+				TrainQueryInfo info = specificTrains.get(specificTrainKeys[i]);
 				// 勾选动车优先
 				if (mainWin.isBoxkTwoSeat()) {
 					if (!Constants.SYS_TICKET_SIGN_1.equals(info.getTwo_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getTwo_seat())) {
 						try {
-							if (Integer.parseInt(info.getTwo_seat()) >= trainQueryInfoList.size()) {
+							if (Integer.parseInt(info.getTwo_seat()) >= userInfoList.size()) {
 								returninfo = info;
 								isAssign = true;
+								setUserSest(userInfoList, Constants.TWO_SEAT);
 								logger.debug("动车优先车次为:" + info.getTrainCode());
 								break;
 							}
 						} catch (NumberFormatException ex) {
 							returninfo = info;
 							isAssign = true;
+							setUserSest(userInfoList, Constants.TWO_SEAT);
 							logger.debug("动车优先车次为:" + info.getTrainCode());
 							break;
 						}
@@ -106,36 +131,37 @@ public class AutoGetTrainInfo {
 				if (mainWin.isHardSleePer()) {
 					if (!Constants.SYS_TICKET_SIGN_1.equals(info.getHard_sleeper()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getHard_sleeper())) {
 						try {
-							if (Integer.parseInt(info.getHard_sleeper()) >= trainQueryInfoList.size()) {
+							if (Integer.parseInt(info.getHard_sleeper()) >= userInfoList.size()) {
 								returninfo = info;
 								isAssign = true;
+								setUserSest(userInfoList, Constants.HARD_SLEEPER);
 								logger.debug("卧铺优先车次为:" + info.getTrainCode());
 								break;
 							}
 						} catch (NumberFormatException ex) {
 							returninfo = info;
 							isAssign = true;
+							setUserSest(userInfoList, Constants.HARD_SLEEPER);
 							logger.debug("卧铺优先车次为:" + info.getTrainCode());
 							break;
 						}
 					}
 				}
 				returninfo = getSeattrainQueryInfo(info);
-				logger.debug("指定车次为:" + info.getTrainCode());
 				isAssign = true;
 			}
 		}
+
+		// 未指定车次
 		if (!isAssign) {
 			for (Map.Entry<String, TrainQueryInfo> map : specificSeatTrains.entrySet()) {
 				TrainQueryInfo info = getSeattrainQueryInfo(map.getValue());
-				if (info != null) {
-					returninfo = info;
-				}
+				returninfo = info;
 				logger.debug("车次为:" + info.getTrainCode());
-				break;
+				return returninfo;
 			}
 		}
-		return returninfo;
+		return null;
 	}
 
 	/**
@@ -145,109 +171,172 @@ public class AutoGetTrainInfo {
 	 * @return TrainQueryInfo
 	 */
 	public TrainQueryInfo getSeattrainQueryInfo(TrainQueryInfo info) {
+
+		// 指定了座位席别
+		if (specificTrainSeat.length > 0) {
+			for (int i = 0; i < specificTrainSeat.length; i++) {
+				try {
+					if (Integer.parseInt(info.getTwo_seat()) >= userInfoList.size()) {
+						setUserSest(userInfoList, specificTrainSeat[i]);
+						return info;
+					}
+				} catch (NumberFormatException ex) {
+					setUserSest(userInfoList, specificTrainSeat[i]);
+					return info;
+				}
+			}
+		}
+
+		// 未指定作为席别 则按照座位顺序席别选取座位席别
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getTwo_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getTwo_seat())) {
 			try {
-				if (Integer.parseInt(info.getTwo_seat()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getTwo_seat()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.TWO_SEAT);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.TWO_SEAT);
 				return info;
 			}
 		}
 
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getOne_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getOne_seat())) {
 			try {
-				if (Integer.parseInt(info.getOne_seat()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getOne_seat()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.ONE_SEAT);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.ONE_SEAT);
 				return info;
 			}
 		}
 
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getHard_sleeper()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getHard_sleeper())) {
 			try {
-				if (Integer.parseInt(info.getHard_sleeper()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getHard_sleeper()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.HARD_SLEEPER);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.HARD_SLEEPER);
 				return info;
 			}
 		}
 
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getSoft_sleeper()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getSoft_sleeper())) {
 			try {
-				if (Integer.parseInt(info.getSoft_sleeper()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getSoft_sleeper()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.SOFT_SLEEPER);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.SOFT_SLEEPER);
 				return info;
 			}
 		}
 
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getSoft_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getSoft_seat())) {
 			try {
-				if (Integer.parseInt(info.getSoft_seat()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getSoft_seat()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.SOFT_SEAT);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.SOFT_SEAT);
 				return info;
 			}
 		}
 
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getHard_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getHard_seat())) {
 			try {
-				if (Integer.parseInt(info.getHard_seat()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getHard_seat()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.HARD_SEAT);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.HARD_SEAT);
 				return info;
 			}
 		}
 
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getVag_sleeper()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getVag_sleeper())) {
 			try {
-				if (Integer.parseInt(info.getVag_sleeper()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getVag_sleeper()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.VAG_SLEEPER);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.VAG_SLEEPER);
 				return info;
 			}
 		}
 
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getBest_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getBest_seat())) {
 			try {
-				if (Integer.parseInt(info.getBest_seat()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getBest_seat()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.BEST_SEAT);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.BEST_SEAT);
 				return info;
 			}
 		}
 
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getBuss_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getBuss_seat())) {
 			try {
-				if (Integer.parseInt(info.getBuss_seat()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getBuss_seat()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.BUSS_SEAT);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.BUSS_SEAT);
 				return info;
 			}
 		}
 
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getNone_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getNone_seat())) {
 			try {
-				if (Integer.parseInt(info.getNone_seat()) >= trainQueryInfoList.size()) {
+				if (Integer.parseInt(info.getNone_seat()) >= userInfoList.size()) {
+					setUserSest(userInfoList, Constants.NONE_SEAT);
 					return info;
 				}
 			} catch (NumberFormatException ex) {
+				setUserSest(userInfoList, Constants.NONE_SEAT);
 				return info;
 			}
 		}
 		return null;
 	}
 
+	/**
+	 * 获取指定的列车
+	 * 
+	 * @return
+	 */
 	private String[] getKeys() {
 		return ResManager.getByKey(Constants.SYS_TRAINCODE).split(",");
+	}
+
+	/**
+	 * 获取指定的座位席别
+	 * 
+	 * @return
+	 */
+	private String[] getSeatKeys() {
+		return ResManager.getByKey(Constants.SYS_USERSEAT).split(",");
+	}
+
+	/**
+	 * 席别选择
+	 * 
+	 * @param userInfoList
+	 * @param seat
+	 */
+	private void setUserSest(List<UserInfo> userInfoList, String seat) {
+		for (UserInfo info : userInfoList) {
+			info.setSeatType(seat);
+		}
 	}
 }

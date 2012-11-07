@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.app.ticket.bean.TrainQueryInfo;
 import org.app.ticket.constants.Constants;
@@ -127,22 +129,39 @@ public class TicketUtil {
 		return startOrEnd;
 	}
 
-	/**
-	 * 获取token
-	 * 
-	 * @param html
-	 * @return String
-	 */
-	public static void getToken(String html) {
-		String regex = "TOKEN\" value=\"";
-		Constants.TOKEN = html.substring(html.indexOf(regex) + regex.length(), html.indexOf(regex) + regex.length() + 32);
-		logger.debug("token = " + Constants.TOKEN);
+	// /**
+	// * 获取token
+	// *
+	// * @param html
+	// * @return String
+	// */
+	// public static void getToken(String html) {
+	// String regex = "TOKEN\" value=\"";
+	// Constants.TOKEN = html.substring(html.indexOf(regex) + regex.length(),
+	// html.indexOf(regex) + regex.length() + 32);
+	// logger.debug("token = " + Constants.TOKEN);
+	// }
+	//
+	// public static void getCredential(String html) {
+	// String regex = "name=\"leftTicketStr\" id=\"left_ticket\"";
+	// Constants.LEFTTICKETSTR = html.substring(html.indexOf(regex) +
+	// regex.length() + 9, html.indexOf(regex) + 86);
+	// logger.debug("leftTicketStr = " + Constants.LEFTTICKETSTR);
+	// }
+	
+	public static void getToken(String content){
+		Matcher m = Pattern.compile("(?is)<input .*?name=\"org.apache.struts.taglib.html.TOKEN\".*?value=\"(\\w+)\".*/?>").matcher(content);
+		if(m.find()){
+			Constants.TOKEN =  m.group(1);
+			logger.debug("token = " + Constants.TOKEN);
+		}
 	}
-
-	public static void getCredential(String html) {
-		String regex = "name=\"leftTicketStr\" id=\"left_ticket\"";
-		Constants.LEFTTICKETSTR = html.substring(html.indexOf(regex) + regex.length() + 9, html.indexOf(regex) + 86);
-		logger.debug("leftTicketStr = " + Constants.LEFTTICKETSTR);
+	public static void getCredential(String content){
+		Matcher m = Pattern.compile("(?is)<input.*?id=\"left_ticket\".*?value=\"(\\w+)\".*/?>").matcher(content);
+		if(m.find()){
+			Constants.LEFTTICKETSTR = m.group(1);
+			logger.debug("leftTicketStr = " + Constants.LEFTTICKETSTR);
+		}
 	}
 
 	/**

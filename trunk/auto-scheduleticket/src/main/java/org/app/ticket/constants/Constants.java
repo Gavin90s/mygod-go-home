@@ -51,6 +51,8 @@ public class Constants {
 	/******************* 系统配置 ****************************/
 	// 指定车次
 	public static final String SYS_TRAINCODE = "traincode";
+	// 指定座位席别
+	public static final String SYS_USERSEAT = "settype";
 	// 线程休眠时间
 	public static final String SYS_THREAD_SLEEPTIME = "5000";
 	// 系统日期输入字符
@@ -101,12 +103,12 @@ public class Constants {
 	public static final String QUERY_TRAINCLASS = "trainClass";
 	// 查询全部
 	public static final String QUERY_TRAINPASSTYPE = "trainPassType";
-	
-	/****************获取火车票数量***********************/
+
+	/**************** 获取火车票数量 ***********************/
 	public static final String GETQUEUECOUNT_FROM = "from";
 	public static final String GETQUEUECOUNT_SEAT = "seat";
 	public static final String GETQUEUECOUNT_STATION = "station";
-	public static final String GETQUEUECOUNT_TICKET= "ticket";
+	public static final String GETQUEUECOUNT_TICKET = "ticket";
 	public static final String GETQUEUECOUNT_TO = "to";
 	public static final String GETQUEUECOUNT_TRAIN_DATE = "train_date";
 

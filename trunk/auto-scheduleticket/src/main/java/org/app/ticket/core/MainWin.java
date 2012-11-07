@@ -34,6 +34,7 @@ import org.app.ticket.bean.TrainQueryInfo;
 import org.app.ticket.bean.UserInfo;
 import org.app.ticket.constants.Constants;
 import org.app.ticket.logic.AutoGetTrainInfo;
+import org.app.ticket.logic.LoginThread;
 import org.app.ticket.msg.ResManager;
 import org.app.ticket.util.StringUtil;
 import org.app.ticket.util.ToolUtil;
@@ -514,7 +515,7 @@ public class MainWin {
 					showMsg(msg + "不能为空！");
 					return;
 				}
-				ToolUtil.login(mainWin);
+				new LoginThread(mainWin).start();
 			}
 		}
 	}
@@ -539,8 +540,7 @@ public class MainWin {
 						if (trainQueryInfo.size() > 0) {
 							showMsg("导入session成功!");
 							messageOut.setText(messageOut.getText() + "本次一共为您筛选到" + trainQueryInfo.size() + "趟列车信息\n");
-							autoGetTrainInfo = getAutoGetTrainInfo();
-							autoGetTrainInfo.trainQueryInfoClass();
+							//autoGetTrainInfo = getAutoGetTrainInfo();
 						} else {
 							showMsg("导入session失败,请仔细检查session!");
 						}
@@ -635,7 +635,7 @@ public class MainWin {
 		return hardSleePer.isSelected();
 	}
 
-	public AutoGetTrainInfo getAutoGetTrainInfo() {
-		return autoGetTrainInfo = new AutoGetTrainInfo(trainQueryInfo, this);
-	}
+	// public AutoGetTrainInfo getAutoGetTrainInfo() {
+	// return autoGetTrainInfo = new AutoGetTrainInfo(trainQueryInfo, this);
+	// }
 }

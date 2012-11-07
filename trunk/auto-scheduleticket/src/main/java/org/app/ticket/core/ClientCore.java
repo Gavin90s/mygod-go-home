@@ -131,7 +131,6 @@ public class ClientCore {
 		try {
 			HttpResponse response = httpclient.execute(get);
 			String responseBody = readInputStream(response.getEntity().getContent());
-			// logger.debug("Respone is " + responseBody);
 			// 获取消息头的信息
 			Header[] headers = response.getAllHeaders();
 			for (int i = 0; i < headers.length; i++) {
@@ -183,13 +182,7 @@ public class ClientCore {
 		// 创建客户端
 		HttpClient httpclient = getHttpClient();
 		HttpPost post = getHttpPost(Constants.POST_UTL_LOGINACTION);
-		post.addHeader("Accept", "text/html, application/xhtml+xml, */*");
-		post.addHeader("Accept-Language", "zh-CN");
-		post.addHeader("Cache-Control", "no-cache");
-		post.addHeader("Connection", "Keep-Alive");
-		post.addHeader("Content-Type", "application/x-www-form-urlencoded");
-		post.addHeader("Host", "dynamic.12306.cn");
-
+		
 		List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 		parameters.add(new BasicNameValuePair(Constants.LOGIN_LOGINRAND, loginDomain.getLoginRand()));
 		parameters.add(new BasicNameValuePair(Constants.LOGIN_USERNAME, loginDomain.getUser_name()));
@@ -309,7 +302,6 @@ public class ClientCore {
 		// 创建客户端
 		HttpClient httpclient = getHttpClient();
 		HttpPost post = getHttpPost(Constants.POST_URL_SUBMUTORDERREQUEST);
-
 		// 提交预定的车次 一共22个参数
 		List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 		parameters.add(new BasicNameValuePair(Constants.ORDER_ARRIVE_TIME, trainQueryInfo.getEndTime()));
@@ -334,11 +326,10 @@ public class ClientCore {
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TRAIN_START_TIME, trainQueryInfo.getStartTime()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TRAINNO4, trainQueryInfo.getTrainno4()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_YPINFODETAIL, trainQueryInfo.getYpInfoDetail()));
-
 		String responseBody;
 		try {
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters, HTTP.UTF_8);
-			logger.debug("dddddddd"+Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER + Constants.SIGN + URLEncodedUtils.format(parameters, HTTP.UTF_8));
+			logger.debug(Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER + Constants.SIGN + URLEncodedUtils.format(parameters, HTTP.UTF_8));
 			post.setEntity(uef);
 			HttpResponse response = httpclient.execute(post);
 			HttpEntity entity = response.getEntity();
@@ -348,11 +339,6 @@ public class ClientCore {
 			logger.debug("statusCode = " + statusCode);
 			// 返回码 301 或 302 转发到location的新地址 用来获取token
 			if (statusCode == HttpStatus.SC_MOVED_PERMANENTLY || statusCode == HttpStatus.SC_MOVED_TEMPORARILY) {
-				// Header[] headers = response.getAllHeaders();
-				// for (int i = 0; i < headers.length; i++) {
-				// System.out.println("name = " + headers[i].getName() +
-				// "|value = " + headers[i].getValue());
-				// }
 				Header locationHeader = response.getFirstHeader("location");
 				String redirectUrl = locationHeader.getValue();
 				post = getHttpPost(redirectUrl);
@@ -360,6 +346,7 @@ public class ClientCore {
 				entity = response.getEntity();
 				responseBody = readInputStream(entity.getContent());
 				TicketUtil.getCredential(responseBody);
+				TicketUtil.getToken(responseBody);
 				logger.debug(responseBody);
 			}
 		} catch (Exception e) {
@@ -417,7 +404,6 @@ public class ClientCore {
 				int byteread = 0;
 				byte[] tmp = new byte[1];
 				while ((byteread = instream.read(tmp)) != -1) {
-					// instream.read(tmp);
 					out.write(tmp);
 				}
 			}
@@ -474,7 +460,7 @@ public class ClientCore {
 		HttpClient httpclient = getHttpClient();
 
 		HttpPost post = getHttpPost(Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER);
-
+			
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
 		List<NameValuePair> parameters = new ArrayList<NameValuePair>();
@@ -526,7 +512,6 @@ public class ClientCore {
 				UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters, HTTP.UTF_8);
 				logger.debug(Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER + Constants.SIGN + URLEncodedUtils.format(parameters, HTTP.UTF_8));
 				post.setEntity(uef);
-
 				responseBody = httpclient.execute(post, responseHandler);
 				logger.info("Response is " + responseBody);
 			} catch (Exception e) {
