@@ -76,7 +76,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>org.app.download.core.EngineCore</mainClass>
+							<mainClass>org.app.ticket.core.MainWin</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
