@@ -67,17 +67,17 @@ public class LoginThread extends Thread {
 					f = random.nextDouble();
 					url += f;
 					System.out.println("url = " + url);
-					ClientCore.getPassCode(url, mainWin.url);
+					ClientCore.getPassCode(url, mainWin.loginUrl);
 
 					String loginRand = getLoginRand();
 
 					logger.debug("-----------loginRand=" + loginRand);
 
 					// 设置背景图片
-					mainWin.code.setIcon(ToolUtil.getImageIcon(mainWin.url));
+					mainWin.code.setIcon(ToolUtil.getImageIcon(mainWin.loginUrl));
 
 					// 识别验证码
-					String valCode = new OCR().recognizeText(tessPath, new File(mainWin.url), "jpg");
+					String valCode = new OCR().recognizeText(tessPath, new File(mainWin.loginUrl), "jpg");
 					valCode = valCode.replaceAll(" ", "").replaceAll("\n", "").replaceAll("\r", "");
 
 					logger.debug("-------------valCode" + valCode);

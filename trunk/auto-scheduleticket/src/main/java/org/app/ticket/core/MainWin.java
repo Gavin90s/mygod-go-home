@@ -33,9 +33,10 @@ import org.app.ticket.bean.OrderRequest;
 import org.app.ticket.bean.TrainQueryInfo;
 import org.app.ticket.bean.UserInfo;
 import org.app.ticket.constants.Constants;
-import org.app.ticket.logic.AutoGetTrainInfo;
 import org.app.ticket.logic.LoginThread;
+import org.app.ticket.logic.TicketThread;
 import org.app.ticket.msg.ResManager;
+import org.app.ticket.util.DateUtil;
 import org.app.ticket.util.StringUtil;
 import org.app.ticket.util.ToolUtil;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * @version V1.0
  * 
  */
-public class MainWin {
+public class MainWin extends JFrame {
 	private static final Logger logger = LoggerFactory.getLogger(MainWin.class);
 	private JFrame frame;
 
@@ -86,26 +87,29 @@ public class MainWin {
 	private JCheckBox boxkTwoSeat;
 	private JCheckBox hardSleePer;
 	private JCheckBox isAutoCode;
-	private JTextField passCode;
 	private JFormattedTextField txtStartDate;
 	private JTextField formCode;
 	private JTextField toCode;
-	private JLabel passCodeImage;
 	private JButton startButton;
-	private JCheckBox allAuto;
 
 	/************* 输出相关 ****************/
 	public JTextArea messageOut;
 
 	/************** 业务逻辑相关的变量 ****************/
+	// 存放列车信息
 	private List<TrainQueryInfo> trainQueryInfo;
-	private AutoGetTrainInfo autoGetTrainInfo = null;
+	// 存放用户信息
+	private List<UserInfo> userInfoList;
+	// 存放查询火车实体
+	private OrderRequest req;
 
-	// 当前jar包所在的路径
-	private static String path;
+	public static String path;
 	private MainWin mainWin = null;
 	// 登录验证码路径
-	public String url;
+	public String loginUrl;
+	public String submitUrl;
+	public static boolean isLogin = false;
+	private static String tessPath = null;
 
 	// 静态构造块
 	static {
@@ -353,34 +357,13 @@ public class MainWin {
 		boxkTwoSeat.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		hardSleePer = new JCheckBox(ResManager.getString("RobotTicket.label.hardSleePer"));
-		hardSleePer.setBounds(100, 26, 100, 15);
+		hardSleePer.setBounds(140, 26, 100, 15);
 		panel6.add(hardSleePer);
 		hardSleePer.setHorizontalAlignment(SwingConstants.RIGHT);
 
-		JLabel label_13 = new JLabel(ResManager.getString("RobotTicket.label.passCode"));
-		label_13.setBounds(180, 26, 60, 13);
-		panel6.add(label_13);
-		label_13.setHorizontalAlignment(SwingConstants.RIGHT);
-
-		passCode = new JTextField();
-		passCode.setToolTipText(ResManager.getString("RobotTicket.label.passCode"));
-		passCode.setBounds(255, 23, 60, 21);
-		panel6.add(passCode);
-		passCode.setColumns(10);
-
-		passCodeImage = new JLabel();
-		passCodeImage.setBounds(325, 23, 60, 20);
-		passCodeImage.setText(ResManager.getString("RobotTicket.label.passCodeImage"));
-		panel6.add(passCodeImage);
-
 		isAutoCode = new JCheckBox(ResManager.getString("RobotTicket.label.isAutoCode"));
-		isAutoCode.setBounds(365, 26, 120, 15);
+		isAutoCode.setBounds(420, 26, 120, 15);
 		panel6.add(isAutoCode);
-		isAutoCode.setHorizontalAlignment(SwingConstants.RIGHT);
-
-		allAuto = new JCheckBox(ResManager.getString("RobotTicket.label.allAutoCode"));
-		allAuto.setBounds(500, 26, 100, 15);
-		panel6.add(allAuto);
 		isAutoCode.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		JLabel label_15 = new JLabel(ResManager.getString("RobotTicket.label.txtStartDate"));
@@ -440,19 +423,10 @@ public class MainWin {
 		messageOut.setText(ResManager.getString("RobotTicket.textarea.messageOut"));
 		messageOut.setEditable(false);
 		messageOut.setLineWrap(true);
-
-		// JScrollPane scroll = new JScrollPane(messageOut);
-		// scroll.setBounds(15, 460, 640, 145);
-		// scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		// frame.add(scroll);
-
-		// messageOut = new JTextArea();
-		// messageOut.setText(ResManager.getString("RobotTicket.textarea.messageOut"));
-		// messageOut.setEditable(false);
-
 	}
 
 	public static void main(String[] arg0) {
+		tessPath = "D:\\Program Files\\Tesseract-OCR";
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -466,7 +440,8 @@ public class MainWin {
 		});
 
 		try {
-			ResManager.initProperties("E:\\config.properties");
+			ResManager.initProperties(path + "config.properties");
+			//ResManager.initProperties("E:\\" + "config.properties");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -476,28 +451,27 @@ public class MainWin {
 		// 初始话布局
 		initLayout();
 		// 初始化登录验证码
-		url = initLoginImage();
+		initLoginImage();
 		this.mainWin = this;
 	}
 
 	// 初始化登录验证码
-	public String initLoginImage() {
-		String url = "";
+	public void initLoginImage() {
 		try {
-			url = path + "image" + File.separator;
-			File file = new File(url);
+			loginUrl = path + "image" + File.separator;
+			File file = new File(loginUrl);
 			if (!file.exists()) {
 				file.mkdirs();
 			}
-			url += "passcode-login.jpg";
+			loginUrl += "passcode-login.jpg";
+			submitUrl = path + "image" + File.separator + "passcode-submit.jpg";
 			// 获取cookie
 			ClientCore.getCookie();
-			ClientCore.getPassCode(Constants.GET_LOGINURL_PASSCODE, url);
-			code.setIcon(ToolUtil.getImageIcon(url));
+			ClientCore.getPassCode(Constants.GET_LOGINURL_PASSCODE, loginUrl);
+			code.setIcon(ToolUtil.getImageIcon(loginUrl));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return url;
 	}
 
 	// 登录按钮onclick事件监听
@@ -506,7 +480,12 @@ public class MainWin {
 		public void actionPerformed(ActionEvent e) {
 			JButton btn = (JButton) e.getSource();
 			if (ResManager.getString("RobotTicket.btn.login").equals(btn.getText())) {
-				List<String> list = ToolUtil.validateWidget(username, password, authcode);
+				List<String> list = null;
+				if (loginAuto.isSelected()) {
+					list = ToolUtil.validateWidget(username, password);
+				} else {
+					list = ToolUtil.validateWidget(username, password, authcode);
+				}
 				if (list.size() > 0) {
 					String msg = "";
 					for (int i = 0; i < list.size(); i++) {
@@ -515,13 +494,15 @@ public class MainWin {
 					showMsg(msg + "不能为空！");
 					return;
 				}
-				new LoginThread(mainWin).start();
+				// 登录线程
+				new LoginThread(mainWin, tessPath).start();
 			}
 		}
 	}
 
 	// 导入按钮onclick事件监听
 	class ImpSession implements ActionListener {
+		@SuppressWarnings("static-access")
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JButton btn = (JButton) e.getSource();
@@ -538,9 +519,10 @@ public class MainWin {
 					try {
 						trainQueryInfo = ClientCore.queryTrain(req);
 						if (trainQueryInfo.size() > 0) {
+							mainWin.isLogin = true;
 							showMsg("导入session成功!");
 							messageOut.setText(messageOut.getText() + "本次一共为您筛选到" + trainQueryInfo.size() + "趟列车信息\n");
-							//autoGetTrainInfo = getAutoGetTrainInfo();
+							// autoGetTrainInfo = getAutoGetTrainInfo();
 						} else {
 							showMsg("导入session失败,请仔细检查session!");
 						}
@@ -554,7 +536,6 @@ public class MainWin {
 
 	// 开始按钮onclick事件监听
 	class StartButton implements ActionListener {
-
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -562,8 +543,19 @@ public class MainWin {
 			if (ResManager.getString("RobotTicket.btn.start").equals(btn.getText())) {
 				List list = getUserInfo();
 				if (list.size() == 0) {
-					showMsg("请输入联系人信息!");
+					showMsg("请至少输入1位联系人信息!");
+					return;
 				}
+				if (!isLogin) {
+					showMsg("请登录!");
+					return;
+				}
+
+				// 获取用户信息
+				getUserInfo();
+				// 获取列车查询实体
+				getOrderRequest();
+				new TicketThread(userInfoList, req, mainWin).start();
 			}
 		}
 
@@ -579,42 +571,47 @@ public class MainWin {
 	}
 
 	/**
-	 * 获取token和提交令牌
-	 */
-	protected void initParameter() {
-		try {
-			// 初始化TOKEN
-			ClientCore.getToken();
-			// 初始提交令牌
-			ClientCore.confirmPassenger();
-			if (StringUtil.isEmptyString(Constants.TOKEN) && StringUtil.isEmptyString(Constants.LEFTTICKETSTR)) {
-				initParameter();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * 获取乘车人
 	 * 
 	 * @return List<UserInfo>
 	 */
 	public List<UserInfo> getUserInfo() {
 		List<UserInfo> list = new ArrayList<UserInfo>();
-		if (!StringUtil.isEmptyString(linkman1_name.getText().trim()) && !StringUtil.isEmptyString(linkman1_cardNo.getText().trim())) {
-			UserInfo userInfo = new UserInfo(linkman1_cardNo.getText().trim(), linkman1_name.getText().trim(), linkman1_mobile.getText().trim());
+		UserInfo userInfo = null;
+		if (!StringUtil.isEmptyString(linkman1_mobile.getText().trim())) {
+			userInfo = new UserInfo(linkman1_cardNo.getText().trim(), linkman1_name.getText().trim(), linkman1_mobile.getText().trim());
 			list.add(userInfo);
+		} else {
+			userInfo = new UserInfo(linkman1_cardNo.getText().trim(), linkman1_name.getText().trim());
 		}
-		if (!StringUtil.isEmptyString(linkman2_name.getText().trim()) && !StringUtil.isEmptyString(linkman2_cardNo.getText().trim())) {
-			UserInfo userInfo = new UserInfo(linkman2_cardNo.getText().trim(), linkman2_name.getText().trim(), linkman2_mobile.getText().trim());
+		if (!StringUtil.isEmptyString(linkman2_mobile.getText().trim())) {
+			userInfo = new UserInfo(linkman2_cardNo.getText().trim(), linkman2_name.getText().trim(), linkman2_mobile.getText().trim());
 			list.add(userInfo);
+		} else {
+			userInfo = new UserInfo(linkman2_cardNo.getText().trim(), linkman2_name.getText().trim());
 		}
-		if (!StringUtil.isEmptyString(linkman3_name.getText().trim()) && !StringUtil.isEmptyString(linkman3_cardNo.getText().trim())) {
-			UserInfo userInfo = new UserInfo(linkman3_cardNo.getText().trim(), linkman3_name.getText().trim(), linkman3_mobile.getText().trim());
+		if (!StringUtil.isEmptyString(linkman3_name.getText().trim())) {
+			userInfo = new UserInfo(linkman3_cardNo.getText().trim(), linkman3_name.getText().trim(), linkman3_mobile.getText().trim());
 			list.add(userInfo);
+		} else {
+			userInfo = new UserInfo(linkman3_cardNo.getText().trim(), linkman3_name.getText().trim());
 		}
+		userInfoList = list;
 		return list;
+	}
+
+	/**
+	 * 获取列车实体
+	 * 
+	 * @return
+	 */
+	private OrderRequest getOrderRequest() {
+		req = new OrderRequest();
+		req.setFrom(formCode.getText().trim());
+		req.setTo(toCode.getText().trim());
+		req.setTrain_date(txtStartDate.getText().trim());
+		req.setQuery_date(DateUtil.getCurDate());
+		return req;
 	}
 
 	/**
@@ -635,7 +632,4 @@ public class MainWin {
 		return hardSleePer.isSelected();
 	}
 
-	// public AutoGetTrainInfo getAutoGetTrainInfo() {
-	// return autoGetTrainInfo = new AutoGetTrainInfo(trainQueryInfo, this);
-	// }
 }

@@ -39,6 +39,8 @@ public class TicketThread extends Thread {
 
 	private static boolean isSuccess = false;
 
+	private int sum = 0;
+
 	public TicketThread() {
 
 	}
@@ -68,7 +70,7 @@ public class TicketThread extends Thread {
 
 				final JTextField t_randcode = new JTextField(10);
 				final JButton btn_randcode = new JButton("");
-				String path = mainWin.url + "\\image\\" + "passcode-submit.jpg";
+				String path = mainWin.submitUrl;
 				ClientCore.getPassCode(Constants.GET_SUBMITURL_PASSCODE, path);
 				btn_randcode.setIcon(ToolUtil.getImageIcon(path));
 
@@ -93,6 +95,8 @@ public class TicketThread extends Thread {
 
 				JButton btn_confirm = new JButton("提交");
 				JPanel p_confirm = new JPanel();
+				mainWin.messageOut.setText(mainWin.messageOut.getText() + "第" + (++sum) + "次提交订单.\n");
+				
 				btn_confirm.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ev) {
 						String msg = "";
@@ -109,6 +113,9 @@ public class TicketThread extends Thread {
 								e.printStackTrace();
 							}
 							logger.debug("最后输出消息:" + randcode + "----------" + msg);
+							if (msg.contains("验证码")) {
+								mainWin.messageOut.setText(mainWin.messageOut.getText() + "验证码错误！\n");
+							}
 							if (msg.contains("Y")) {
 								isSuccess = true;
 								mainWin.showMsg("订票成功!");
