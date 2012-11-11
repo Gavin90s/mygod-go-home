@@ -337,7 +337,7 @@ public class ClientCore {
 			logger.debug(responseBody);
 			int statusCode = response.getStatusLine().getStatusCode();
 			logger.debug("statusCode = " + statusCode);
-			// 返回码 301 或 302 转发到location的新地址 用来获取token
+			// 返回码 301 或 302 转发到location的新地址
 			if (statusCode == HttpStatus.SC_MOVED_PERMANENTLY || statusCode == HttpStatus.SC_MOVED_TEMPORARILY) {
 				Header locationHeader = response.getFirstHeader("location");
 				String redirectUrl = locationHeader.getValue();

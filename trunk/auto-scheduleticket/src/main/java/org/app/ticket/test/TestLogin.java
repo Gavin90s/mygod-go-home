@@ -46,7 +46,7 @@ public class TestLogin {
 				System.out.println("-----------loginRand=" + loginRand);
 
 				// 识别验证码
-				String valCode = new OCR().recognizeText(new File(path + "passCode.jpg"), "jpg");
+				String valCode = new OCR().recognizeText(null, new File(path + "passCode.jpg"), "jpg");
 				valCode = valCode.replaceAll(" ", "").replaceAll("\n", "").replaceAll("\r", "");
 
 				System.out.println("-------------valCode" + valCode);

@@ -42,10 +42,6 @@ public class AutoGetTrainInfo {
 	/** 所有有票的车(不包含指定的车) */
 	private Map<String, TrainQueryInfo> specificSeatTrains = new HashMap<String, TrainQueryInfo>();
 
-	public AutoGetTrainInfo() {
-
-	}
-
 	public AutoGetTrainInfo(List<TrainQueryInfo> trainQueryInfoList, MainWin mainWin, List<UserInfo> userInfoList) {
 		this.trainQueryInfoList = trainQueryInfoList;
 		this.mainWin = mainWin;
@@ -69,29 +65,33 @@ public class AutoGetTrainInfo {
 			for (int i = trainQueryInfoList.size() - 1; i >= 0; i--) {
 				if (specificTrainKeys[j].equals(trainQueryInfoList.get(i).getTrainNo())) {
 					// 存放指定的车
-					specificTrains.put(trainQueryInfoList.get(i).getTrainCode(), trainQueryInfoList.get(i));
-					logger.debug("指定车次为:" + trainQueryInfoList.get(i).getTrainNo());
+					specificTrains.put(trainQueryInfoList.get(i).getTrainNo(), trainQueryInfoList.get(i));
 					trainQueryInfoList.remove(i);
-				}
-				// 获取指定车之外有票的列车
-				if (!StringUtil.isEmptyString(trainQueryInfoList.get(i).getMmStr())) {
-					specificSeatTrains.put(trainQueryInfoList.get(i).getTrainCode(), trainQueryInfoList.get(i));
 				}
 			}
 		}
+		
+		for (int i = trainQueryInfoList.size() - 1; i >= 0; i--) {
+			// 获取指定车之外有票的列车
+			if (!StringUtil.isEmptyString(trainQueryInfoList.get(i).getMmStr())) {
+				specificSeatTrains.put(trainQueryInfoList.get(i).getTrainNo(), trainQueryInfoList.get(i));
+				trainQueryInfoList.remove(i);
+			}
+		}
+		
 		String specificTrain = "";
 		for (Map.Entry<String, TrainQueryInfo> key : specificTrains.entrySet()) {
-			specificTrain += key.getKey() + ",";
+			specificTrain += ((TrainQueryInfo)key.getValue()).getTrainNo() + ",";
 		}
 		String specificSeatTrain = "";
 		for (Map.Entry<String, TrainQueryInfo> key : specificSeatTrains.entrySet()) {
-			specificSeatTrain += key.getKey() + ",";
+			specificSeatTrain +=  ((TrainQueryInfo)key.getValue()).getTrainNo() + ",";
 		}
 		if (!StringUtil.isEmptyString(specificTrain)) {
 			logger.debug("指定列车信息:" + specificTrain.substring(0, specificTrain.length() - 1));
 		}
 		if (!StringUtil.isEmptyString(specificSeatTrain)) {
-			logger.debug("指定之外列车信息:" + specificTrain.substring(0, specificTrain.length() - 1));
+			logger.debug("指定之外列车信息:" + specificSeatTrain.substring(0, specificSeatTrain.length() - 1));
 		}
 	}
 
@@ -150,15 +150,18 @@ public class AutoGetTrainInfo {
 				returninfo = getSeattrainQueryInfo(info);
 				isAssign = true;
 			}
+			return returninfo;
 		}
 
 		// 未指定车次
 		if (!isAssign) {
 			for (Map.Entry<String, TrainQueryInfo> map : specificSeatTrains.entrySet()) {
 				TrainQueryInfo info = getSeattrainQueryInfo(map.getValue());
-				returninfo = info;
-				logger.debug("车次为:" + info.getTrainCode());
-				return returninfo;
+				if (info != null) {
+					returninfo = info;
+					logger.debug("车次为:" + info.getTrainCode());
+					return returninfo;
+				}
 			}
 		}
 		return null;
@@ -171,7 +174,6 @@ public class AutoGetTrainInfo {
 	 * @return TrainQueryInfo
 	 */
 	public TrainQueryInfo getSeattrainQueryInfo(TrainQueryInfo info) {
-
 		// 指定了座位席别
 		if (specificTrainSeat.length > 0) {
 			for (int i = 0; i < specificTrainSeat.length; i++) {

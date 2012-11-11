@@ -28,15 +28,18 @@ public class LoginThread extends Thread {
 	private static final Logger logger = LoggerFactory.getLogger(MainWin.class);
 
 	private MainWin mainWin;
-	
+
 	private boolean islogin = false;
+
+	private String tessPath;
 
 	public LoginThread() {
 
 	}
 
-	public LoginThread(MainWin mainWin) {
+	public LoginThread(MainWin mainWin, String tessPath) {
 		this.mainWin = mainWin;
+		this.tessPath = tessPath;
 	}
 
 	@Override
@@ -50,6 +53,7 @@ public class LoginThread extends Thread {
 				String loginStr = ClientCore.Login(login);
 				if (loginStr.contains("您最后一次登录时间为")) {
 					islogin = true;
+					mainWin.isLogin = true;
 					mainWin.showMsg("登录成功！");
 				} else {
 					mainWin.showMsg("登录失败,请仔细坚持验证码！");
@@ -73,7 +77,7 @@ public class LoginThread extends Thread {
 					mainWin.code.setIcon(ToolUtil.getImageIcon(mainWin.url));
 
 					// 识别验证码
-					String valCode = new OCR().recognizeText(new File(mainWin.url), "jpg");
+					String valCode = new OCR().recognizeText(tessPath, new File(mainWin.url), "jpg");
 					valCode = valCode.replaceAll(" ", "").replaceAll("\n", "").replaceAll("\r", "");
 
 					logger.debug("-------------valCode" + valCode);
@@ -93,6 +97,7 @@ public class LoginThread extends Thread {
 					String loginStr = ClientCore.Login(login);
 					if (loginStr.contains("您最后一次登录时间为")) {
 						islogin = true;
+						mainWin.isLogin = true;
 						break;
 					}
 
