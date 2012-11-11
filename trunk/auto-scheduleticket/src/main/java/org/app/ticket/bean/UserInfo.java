@@ -50,6 +50,12 @@ public class UserInfo implements Serializable {
 
 	public UserInfo() {
 	}
+	
+	public UserInfo(String cardID, String name){
+		this.cardID = cardID;
+		this.name = name;
+		this.phone = "";
+	}
 
 	public UserInfo(String cardID, String name, String phone) {
 		this.cardID = cardID;
