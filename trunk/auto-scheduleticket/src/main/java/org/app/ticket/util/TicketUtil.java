@@ -148,17 +148,18 @@ public class TicketUtil {
 	// regex.length() + 9, html.indexOf(regex) + 86);
 	// logger.debug("leftTicketStr = " + Constants.LEFTTICKETSTR);
 	// }
-	
-	public static void getToken(String content){
+
+	public static void getToken(String content) {
 		Matcher m = Pattern.compile("(?is)<input .*?name=\"org.apache.struts.taglib.html.TOKEN\".*?value=\"(\\w+)\".*/?>").matcher(content);
-		if(m.find()){
-			Constants.TOKEN =  m.group(1);
+		if (m.find()) {
+			Constants.TOKEN = m.group(1);
 			logger.debug("token = " + Constants.TOKEN);
 		}
 	}
-	public static void getCredential(String content){
+
+	public static void getCredential(String content) {
 		Matcher m = Pattern.compile("(?is)<input.*?id=\"left_ticket\".*?value=\"(\\w+)\".*/?>").matcher(content);
-		if(m.find()){
+		if (m.find()) {
 			Constants.LEFTTICKETSTR = m.group(1);
 			logger.debug("leftTicketStr = " + Constants.LEFTTICKETSTR);
 		}
@@ -175,7 +176,6 @@ public class TicketUtil {
 		if (mmString.contains("class=\'yuding_u\'")) {
 			String regex = "getSelected(\'";
 			mString = mmString.substring(mmString.indexOf("regex") + regex.length(), mmString.indexOf("\')")).split("#");
-			logger.debug("mmString is " + mString);
 		}
 		return mString;
 	}

@@ -57,6 +57,12 @@ public class TicketThread extends Thread {
 			try {
 				// 查询火车信息
 				trainQueryInfoList = ClientCore.queryTrain(req);
+				mainWin.messageOut.setText(mainWin.messageOut.getText() + "火车信息\n");
+				if (trainQueryInfoList.size() > 0) {
+					for(TrainQueryInfo t:trainQueryInfoList){
+						mainWin.messageOut.setText(mainWin.messageOut.getText() + t.toString()+"\n");
+					}
+				}
 				// 获取火车信息
 				trainQueryInfo = (new AutoGetTrainInfo(trainQueryInfoList, mainWin, userInfos)).getSeattrainQueryInfo();
 				// 第二步 提交预定车次信息(获取重定向地址中的URL和LEFTTICKETSTR)
@@ -96,7 +102,7 @@ public class TicketThread extends Thread {
 				JButton btn_confirm = new JButton("提交");
 				JPanel p_confirm = new JPanel();
 				mainWin.messageOut.setText(mainWin.messageOut.getText() + "第" + (++sum) + "次提交订单.\n");
-				
+
 				btn_confirm.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent ev) {
 						String msg = "";

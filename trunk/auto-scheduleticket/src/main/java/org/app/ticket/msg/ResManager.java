@@ -57,8 +57,11 @@ public class ResManager {
 
 	public static String getByKey(String key) {
 		try {
+			if(EXIT_RESOURCE_BUNDLE==null){
+				return "";
+			}
 			return EXIT_RESOURCE_BUNDLE.getString(key);
-		} catch (MissingResourceException e) {
+		} catch (Exception e) {
 			return "";
 		}
 	}

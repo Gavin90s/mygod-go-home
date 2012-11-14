@@ -3,6 +3,8 @@ package org.app.ticket.core;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -133,6 +135,43 @@ public class MainWin extends JFrame {
 		frame.setLocationRelativeTo(null);
 		ToolTipManager.sharedInstance().setInitialDelay(0);
 		frame.getContentPane().setLayout(null);
+		// 关闭窗口 保存相关用户信息
+		frame.addWindowListener(new WindowListener() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// 保存用户实体
+				try {
+					ToolUtil.getUserInfo(path, "UI.dat", username, password, linkman1_name, linkman1_cardNo, linkman1_mobile, linkman2_name, linkman2_cardNo, linkman2_mobile, linkman3_name,
+					        linkman3_cardNo, linkman3_mobile);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+			}
+		});
 
 		/****************** 登录控件相关 **********************/
 		JPanel panel_o = new JPanel();
@@ -147,6 +186,7 @@ public class MainWin extends JFrame {
 		label_o.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		username = new JTextField();
+		username.setName("username");
 		username.setToolTipText(ResManager.getString("RobotTicket.label.user_name"));
 		username.setBounds(60, 23, 100, 21);
 		panel_o.add(username);
@@ -158,6 +198,7 @@ public class MainWin extends JFrame {
 		label_o1.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		password = new JPasswordField();
+		password.setName("password");
 		password.setToolTipText(ResManager.getString("RobotTicket.label.password"));
 		password.setBounds(220, 23, 100, 21);
 		panel_o.add(password);
@@ -239,6 +280,7 @@ public class MainWin extends JFrame {
 		label_2.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		linkman1_name = new JTextField();
+		linkman1_name.setName("linkman1_name");
 		linkman1_name.setToolTipText(ResManager.getString("RobotTicket.label.username"));
 		linkman1_name.setBounds(95, 23, 40, 21);
 		panel3.add(linkman1_name);
@@ -250,6 +292,7 @@ public class MainWin extends JFrame {
 		label_3.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		linkman1_cardNo = new JTextField();
+		linkman1_cardNo.setName("linkman1_cardNo");
 		linkman1_cardNo.setToolTipText(ResManager.getString("RobotTicket.label.cardno"));
 		linkman1_cardNo.setBounds(215, 23, 150, 21);
 		panel3.add(linkman1_cardNo);
@@ -261,6 +304,7 @@ public class MainWin extends JFrame {
 		label_4.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		linkman1_mobile = new JTextField();
+		linkman1_mobile.setName("linkman1_mobile");
 		linkman1_mobile.setToolTipText(ResManager.getString("RobotTicket.label.mobilephone"));
 		linkman1_mobile.setBounds(425, 23, 100, 21);
 		panel3.add(linkman1_mobile);
@@ -278,6 +322,7 @@ public class MainWin extends JFrame {
 		label_5.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		linkman2_name = new JTextField();
+		linkman2_name.setName("linkman2_name");
 		linkman2_name.setToolTipText(ResManager.getString("RobotTicket.label.username"));
 		linkman2_name.setBounds(95, 23, 40, 21);
 		panel4.add(linkman2_name);
@@ -289,6 +334,7 @@ public class MainWin extends JFrame {
 		label_6.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		linkman2_cardNo = new JTextField();
+		linkman2_cardNo.setName("linkman2_cardNo");
 		linkman2_cardNo.setToolTipText(ResManager.getString("RobotTicket.label.cardno"));
 		linkman2_cardNo.setBounds(215, 23, 150, 21);
 		panel4.add(linkman2_cardNo);
@@ -300,6 +346,7 @@ public class MainWin extends JFrame {
 		label_7.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		linkman2_mobile = new JTextField();
+		linkman2_mobile.setName("linkman2_mobile");
 		linkman2_mobile.setToolTipText(ResManager.getString("RobotTicket.label.mobilephone"));
 		linkman2_mobile.setBounds(425, 23, 100, 21);
 		panel4.add(linkman2_mobile);
@@ -317,6 +364,7 @@ public class MainWin extends JFrame {
 		label_8.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		linkman3_name = new JTextField();
+		linkman3_name.setName("linkman3_name");
 		linkman3_name.setToolTipText(ResManager.getString("RobotTicket.label.username"));
 		linkman3_name.setBounds(95, 23, 40, 21);
 		panel5.add(linkman3_name);
@@ -328,6 +376,7 @@ public class MainWin extends JFrame {
 		label_9.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		linkman3_cardNo = new JTextField();
+		linkman3_cardNo.setName("linkman3_cardNo");
 		linkman3_cardNo.setToolTipText(ResManager.getString("RobotTicket.label.cardno"));
 		linkman3_cardNo.setBounds(215, 23, 150, 21);
 		panel5.add(linkman3_cardNo);
@@ -339,6 +388,7 @@ public class MainWin extends JFrame {
 		label_10.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		linkman3_mobile = new JTextField();
+		linkman3_mobile.setName("linkman3_mobile");
 		linkman3_mobile.setToolTipText(ResManager.getString("RobotTicket.label.mobilephone"));
 		linkman3_mobile.setBounds(425, 23, 100, 21);
 		panel5.add(linkman3_mobile);
@@ -426,6 +476,8 @@ public class MainWin extends JFrame {
 	}
 
 	public static void main(String[] arg0) {
+		// TODO
+		tessPath = arg0[0];
 		tessPath = "D:\\Program Files\\Tesseract-OCR";
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -440,8 +492,14 @@ public class MainWin extends JFrame {
 		});
 
 		try {
-			ResManager.initProperties(path + "config.properties");
-			//ResManager.initProperties("E:\\" + "config.properties");
+			// TODO
+			// File file = new File(path + "config.properties");
+			File file = new File("E:\\" + "config.properties");
+			if (!file.exists()) {
+				return;
+			}
+			// ResManager.initProperties(path + "config.properties");
+			ResManager.initProperties("E:\\" + "config.properties");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -453,6 +511,13 @@ public class MainWin extends JFrame {
 		// 初始化登录验证码
 		initLoginImage();
 		this.mainWin = this;
+		try {
+			ToolUtil.setUserInfo(path, "UI.dat", username, password, linkman1_cardNo, linkman1_name, linkman1_mobile, linkman2_cardNo, linkman2_name, linkman2_mobile, linkman3_cardNo, linkman3_name,
+			        linkman3_mobile);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("初始化界面赋值失败！");
+		}
 	}
 
 	// 初始化登录验证码
@@ -542,12 +607,24 @@ public class MainWin extends JFrame {
 			JButton btn = (JButton) e.getSource();
 			if (ResManager.getString("RobotTicket.btn.start").equals(btn.getText())) {
 				List list = getUserInfo();
+				// 未输入联系人
 				if (list.size() == 0) {
 					showMsg("请至少输入1位联系人信息!");
 					return;
 				}
+				// 未登录
 				if (!isLogin) {
 					showMsg("请登录!");
+					return;
+				}
+				// 验证控件是否输入
+				List<String> msglist = ToolUtil.validateWidget(txtStartDate, formCode, toCode);
+				if (msglist.size() > 0) {
+					String msg = "";
+					for (int i = 0; i < msglist.size(); i++) {
+						msg += (i == msglist.size() - 1 ? msglist.get(i) : msglist.get(i) + ",");
+					}
+					showMsg(msg + "不能为空！");
 					return;
 				}
 
@@ -558,7 +635,6 @@ public class MainWin extends JFrame {
 				new TicketThread(userInfoList, req, mainWin).start();
 			}
 		}
-
 	}
 
 	/**
