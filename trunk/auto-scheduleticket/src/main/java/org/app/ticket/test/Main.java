@@ -8,7 +8,6 @@ import org.app.ticket.bean.TrainQueryInfo;
 import org.app.ticket.bean.UserInfo;
 import org.app.ticket.constants.Constants;
 import org.app.ticket.core.ClientCore;
-import org.app.ticket.logic.SubmitThread;
 import org.app.ticket.util.DateUtil;
 
 public class Main {
@@ -41,7 +40,8 @@ public class Main {
 		// 获取火车票数量
 		ClientCore.getQueueCount(Constants.GET_URL_GETQUEUECOUNT, req, userInfos, trainQueryInfoList.get(1));
 
-		SubmitThread sb = new SubmitThread(null,trainQueryInfoList, userInfos, req, null);
-		sb.start();
+		// SubmitThread sb = new SubmitThread(null,trainQueryInfoList,
+		// userInfos, req, null);
+		//sb.start();
 	}
 }

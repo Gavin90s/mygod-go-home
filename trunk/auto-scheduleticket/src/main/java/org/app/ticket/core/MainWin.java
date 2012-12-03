@@ -36,6 +36,7 @@ import org.app.ticket.bean.TrainQueryInfo;
 import org.app.ticket.bean.UserInfo;
 import org.app.ticket.constants.Constants;
 import org.app.ticket.logic.LoginThread;
+import org.app.ticket.logic.SubmitThread;
 import org.app.ticket.logic.TicketThread;
 import org.app.ticket.msg.ResManager;
 import org.app.ticket.util.DateUtil;
@@ -88,7 +89,7 @@ public class MainWin extends JFrame {
 	/************** 配置相关 *****************/
 	private JCheckBox boxkTwoSeat;
 	private JCheckBox hardSleePer;
-	private JCheckBox isAutoCode;
+	public JCheckBox isAutoCode;
 	private JFormattedTextField txtStartDate;
 	private JTextField formCode;
 	private JTextField toCode;
@@ -112,6 +113,7 @@ public class MainWin extends JFrame {
 	public String submitUrl;
 	public static boolean isLogin = false;
 	private static String tessPath = null;
+	public int isOnclick = 1;
 
 	// 静态构造块
 	static {
@@ -157,8 +159,7 @@ public class MainWin extends JFrame {
 			public void windowClosing(WindowEvent e) {
 				// 保存用户实体
 				try {
-					ToolUtil.getUserInfo(path, "UI.dat", username, password, linkman1_name, linkman1_cardNo, linkman1_mobile, linkman2_name, linkman2_cardNo, linkman2_mobile, linkman3_name,
-					        linkman3_cardNo, linkman3_mobile);
+					ToolUtil.getUserInfo(path, "UI.dat", username, password, linkman1_name, linkman1_cardNo, linkman1_mobile, linkman2_name, linkman2_cardNo, linkman2_mobile, linkman3_name, linkman3_cardNo, linkman3_mobile);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -477,7 +478,7 @@ public class MainWin extends JFrame {
 
 	public static void main(String[] arg0) {
 		// TODO
-		tessPath = arg0[0];
+		// tessPath = arg0[0];
 		tessPath = "D:\\Program Files\\Tesseract-OCR";
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -512,8 +513,7 @@ public class MainWin extends JFrame {
 		initLoginImage();
 		this.mainWin = this;
 		try {
-			ToolUtil.setUserInfo(path, "UI.dat", username, password, linkman1_cardNo, linkman1_name, linkman1_mobile, linkman2_cardNo, linkman2_name, linkman2_mobile, linkman3_cardNo, linkman3_name,
-			        linkman3_mobile);
+			ToolUtil.setUserInfo(path, "UI.dat", username, password, linkman1_cardNo, linkman1_name, linkman1_mobile, linkman2_cardNo, linkman2_name, linkman2_mobile, linkman3_cardNo, linkman3_name, linkman3_mobile);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("初始化界面赋值失败！");
@@ -604,6 +604,7 @@ public class MainWin extends JFrame {
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			isOnclick++;
 			JButton btn = (JButton) e.getSource();
 			if (ResManager.getString("RobotTicket.btn.start").equals(btn.getText())) {
 				List list = getUserInfo();
@@ -628,11 +629,15 @@ public class MainWin extends JFrame {
 					return;
 				}
 
-				// 获取用户信息
-				getUserInfo();
 				// 获取列车查询实体
 				getOrderRequest();
-				new TicketThread(userInfoList, req, mainWin).start();
+				if (isOnclick % 2 == 0) {
+					if (loginAuto.isSelected() && isAutoCode.isSelected()) {
+						new SubmitThread(userInfoList, req, mainWin).start();
+					} else {
+						new TicketThread(userInfoList, req, mainWin).start();
+					}
+				}
 			}
 		}
 	}
@@ -653,24 +658,32 @@ public class MainWin extends JFrame {
 	 */
 	public List<UserInfo> getUserInfo() {
 		List<UserInfo> list = new ArrayList<UserInfo>();
-		UserInfo userInfo = null;
-		if (!StringUtil.isEmptyString(linkman1_mobile.getText().trim())) {
-			userInfo = new UserInfo(linkman1_cardNo.getText().trim(), linkman1_name.getText().trim(), linkman1_mobile.getText().trim());
-			list.add(userInfo);
-		} else {
-			userInfo = new UserInfo(linkman1_cardNo.getText().trim(), linkman1_name.getText().trim());
+		if (StringUtil.isEmptyString(linkman1_cardNo.getText().trim()) || !StringUtil.isEmptyString(linkman1_name.getText().trim())) {
+			if (!StringUtil.isEmptyString(linkman1_mobile.getText().trim())) {
+				UserInfo userInfo1 = new UserInfo(linkman1_cardNo.getText().trim(), linkman1_name.getText().trim(), linkman1_mobile.getText().trim());
+				list.add(userInfo1);
+			} else {
+				UserInfo userInfo1 = new UserInfo(linkman1_cardNo.getText().trim(), linkman1_name.getText().trim());
+				list.add(userInfo1);
+			}
 		}
-		if (!StringUtil.isEmptyString(linkman2_mobile.getText().trim())) {
-			userInfo = new UserInfo(linkman2_cardNo.getText().trim(), linkman2_name.getText().trim(), linkman2_mobile.getText().trim());
-			list.add(userInfo);
-		} else {
-			userInfo = new UserInfo(linkman2_cardNo.getText().trim(), linkman2_name.getText().trim());
+		if (!StringUtil.isEmptyString(linkman2_cardNo.getText().trim()) || !StringUtil.isEmptyString(linkman2_name.getText().trim())) {
+			if (!StringUtil.isEmptyString(linkman2_mobile.getText().trim())) {
+				UserInfo userInfo2 = new UserInfo(linkman2_cardNo.getText().trim(), linkman2_name.getText().trim(), linkman2_mobile.getText().trim());
+				list.add(userInfo2);
+			} else {
+				UserInfo userInfo2 = new UserInfo(linkman2_cardNo.getText().trim(), linkman2_name.getText().trim());
+				list.add(userInfo2);
+			}
 		}
-		if (!StringUtil.isEmptyString(linkman3_name.getText().trim())) {
-			userInfo = new UserInfo(linkman3_cardNo.getText().trim(), linkman3_name.getText().trim(), linkman3_mobile.getText().trim());
-			list.add(userInfo);
-		} else {
-			userInfo = new UserInfo(linkman3_cardNo.getText().trim(), linkman3_name.getText().trim());
+		if (!StringUtil.isEmptyString(linkman3_cardNo.getText().trim()) || !StringUtil.isEmptyString(linkman3_name.getText().trim())) {
+			if (!StringUtil.isEmptyString(linkman3_name.getText().trim())) {
+				UserInfo userInfo3 = new UserInfo(linkman3_cardNo.getText().trim(), linkman3_name.getText().trim(), linkman3_mobile.getText().trim());
+				list.add(userInfo3);
+			} else {
+				UserInfo userInfo3 = new UserInfo(linkman3_cardNo.getText().trim(), linkman3_name.getText().trim());
+				list.add(userInfo3);
+			}
 		}
 		userInfoList = list;
 		return list;
@@ -706,6 +719,10 @@ public class MainWin extends JFrame {
 	 */
 	public boolean isHardSleePer() {
 		return hardSleePer.isSelected();
+	}
+
+	public JButton getStartButton() {
+		return startButton;
 	}
 
 }

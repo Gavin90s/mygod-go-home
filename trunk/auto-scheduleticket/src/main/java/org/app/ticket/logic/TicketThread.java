@@ -19,6 +19,8 @@ import org.app.ticket.bean.UserInfo;
 import org.app.ticket.constants.Constants;
 import org.app.ticket.core.ClientCore;
 import org.app.ticket.core.MainWin;
+import org.app.ticket.msg.ResManager;
+import org.app.ticket.util.StringUtil;
 import org.app.ticket.util.ToolUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,20 +55,28 @@ public class TicketThread extends Thread {
 
 	@Override
 	public void run() {
+		mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.stop"));
 		while (!isSuccess) {
+			if (mainWin.isOnclick % 2 != 0) {
+				mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
+				break;
+			}
 			try {
 				// 查询火车信息
 				trainQueryInfoList = ClientCore.queryTrain(req);
 				mainWin.messageOut.setText(mainWin.messageOut.getText() + "火车信息\n");
 				if (trainQueryInfoList.size() > 0) {
-					for(TrainQueryInfo t:trainQueryInfoList){
-						mainWin.messageOut.setText(mainWin.messageOut.getText() + t.toString()+"\n");
+					for (TrainQueryInfo t : trainQueryInfoList) {
+						mainWin.messageOut.setText(mainWin.messageOut.getText() + t.toString() + "\n");
 					}
 				}
 				// 获取火车信息
 				trainQueryInfo = (new AutoGetTrainInfo(trainQueryInfoList, mainWin, userInfos)).getSeattrainQueryInfo();
 				// 第二步 提交预定车次信息(获取重定向地址中的URL和LEFTTICKETSTR)
 				ClientCore.submitOrderRequest(trainQueryInfo, req);
+				if (mainWin.isAutoCode.isSelected()) {
+
+				}
 				final JDialog randcodeDialog = new JDialog(mainWin, "输入验证码", true);
 				randcodeDialog.setSize(200, 150);
 				randcodeDialog.setLocationRelativeTo(mainWin);
@@ -84,7 +94,7 @@ public class TicketThread extends Thread {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
-							String path = System.getProperty("user.dir") + "\\image\\" + "passcode-submit.jpg";
+							String path = mainWin.submitUrl;
 							ClientCore.getPassCode(Constants.GET_SUBMITURL_PASSCODE, path);
 							btn_randcode.setIcon(ToolUtil.getImageIcon(path));
 							logger.debug("获取订单验证码----");
@@ -125,6 +135,7 @@ public class TicketThread extends Thread {
 							if (msg.contains("Y")) {
 								isSuccess = true;
 								mainWin.showMsg("订票成功!");
+								mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
 							}
 							randcodeDialog.setVisible(false);
 							randcodeDialog.dispose();
@@ -140,7 +151,7 @@ public class TicketThread extends Thread {
 				container.add(p_confirm);
 				randcodeDialog.setVisible(true);
 				// 休眠线程1S
-				sleep(1000);
+				sleep(Integer.parseInt(StringUtil.isEmptyString(ResManager.getByKey("sleeptime")) ? "1000" : ResManager.getByKey("sleeptime")));
 
 			} catch (Exception e) {
 				e.printStackTrace();

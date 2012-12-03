@@ -182,7 +182,7 @@ public class ClientCore {
 		// 创建客户端
 		HttpClient httpclient = getHttpClient();
 		HttpPost post = getHttpPost(Constants.POST_UTL_LOGINACTION);
-		
+
 		List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 		parameters.add(new BasicNameValuePair(Constants.LOGIN_LOGINRAND, loginDomain.getLoginRand()));
 		parameters.add(new BasicNameValuePair(Constants.LOGIN_USERNAME, loginDomain.getUser_name()));
@@ -453,14 +453,13 @@ public class ClientCore {
 	 * @throws KeyManagementException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public static String confirmSingleForQueueOrder(TrainQueryInfo trainQueryInfo, OrderRequest orderRequest, List<UserInfo> userInfoList, String randCode) throws KeyManagementException,
-			NoSuchAlgorithmException {
+	public static String confirmSingleForQueueOrder(TrainQueryInfo trainQueryInfo, OrderRequest orderRequest, List<UserInfo> userInfoList, String randCode) throws KeyManagementException, NoSuchAlgorithmException {
 		logger.debug("-------------------confirmSingleForQueueOrder start-------------------");
 		// 创建客户端
 		HttpClient httpclient = getHttpClient();
 
 		HttpPost post = getHttpPost(Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER);
-			
+
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
 		List<NameValuePair> parameters = new ArrayList<NameValuePair>();
@@ -506,21 +505,22 @@ public class ClientCore {
 			parameters.add(new BasicNameValuePair("passenger_" + (i + 1) + "_seat_detail", "0"));
 			parameters.add(new BasicNameValuePair("passenger_" + (i + 1) + "_ticket", userInfoList.get(i).getTickType()));
 			parameters.add(new BasicNameValuePair(Constants.SUBMIT_PASSENGERTICKETS, userInfoList.get(i).getText()));
-			parameters.add(new BasicNameValuePair(Constants.SUBMIT_RANDCODE, randCode));
-			parameters.add(new BasicNameValuePair(Constants.SUBMIT_TEXTFIELD, "中文或拼音首字母"));
-			try {
-				UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters, HTTP.UTF_8);
-				logger.debug(Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER + Constants.SIGN + URLEncodedUtils.format(parameters, HTTP.UTF_8));
-				post.setEntity(uef);
-				responseBody = httpclient.execute(post, responseHandler);
-				logger.info("Response is " + responseBody);
-			} catch (Exception e) {
-				logger.warn(e.getMessage());
-				e.printStackTrace();
-			} finally {
-				httpclient.getConnectionManager().shutdown();
-			}
 		}
+		parameters.add(new BasicNameValuePair(Constants.SUBMIT_RANDCODE, randCode));
+		parameters.add(new BasicNameValuePair(Constants.SUBMIT_TEXTFIELD, "中文或拼音首字母"));
+		try {
+			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters, HTTP.UTF_8);
+			logger.debug(Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER + Constants.SIGN + URLEncodedUtils.format(parameters, HTTP.UTF_8));
+			post.setEntity(uef);
+			responseBody = httpclient.execute(post, responseHandler);
+			logger.info("Response is " + responseBody);
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			httpclient.getConnectionManager().shutdown();
+		}
+
 		logger.debug("-------------------confirmSingleForQueueOrder end-------------------");
 		return responseBody;
 	}
