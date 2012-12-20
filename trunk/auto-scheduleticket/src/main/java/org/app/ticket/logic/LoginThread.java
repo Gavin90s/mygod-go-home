@@ -51,12 +51,12 @@ public class LoginThread extends Thread {
 				String loginRand = getLoginRand();
 				login = new LoginDomain(loginRand, mainWin.username.getText(), mainWin.authcode.getText(), "Y", "N", mainWin.password.getText());
 				String loginStr = ClientCore.Login(login);
-				if (loginStr.contains("您最后一次登录时间为")) {
+				if (loginStr.contains("欢迎您登录中国铁路客户服务中心网站")) {
 					islogin = true;
 					mainWin.isLogin = true;
 					mainWin.showMsg("登录成功！");
 				} else {
-					mainWin.showMsg("登录失败,请仔细坚持验证码！");
+					mainWin.showMsg("登录失败,请仔细检查验证码！");
 				}
 			} else {
 				ClientCore.getCookie();

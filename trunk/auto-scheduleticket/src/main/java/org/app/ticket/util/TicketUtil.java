@@ -29,8 +29,15 @@ public class TicketUtil {
 
 	private static Map<String, String> cityName2Code = new HashMap<String, String>();
 	static {
-		String city[] = StationConstant.stationString.split("@");
-		for (String tmp : city) {
+		String city1[] = StationConstant.stationString1.split("@");
+		String city2[] = StationConstant.stationString2.split("@");
+		for (String tmp : city1) {
+			if (tmp.isEmpty())
+				continue;
+			String temp[] = tmp.split("\\|");
+			cityName2Code.put(temp[1], temp[2]);
+		}
+		for (String tmp : city2) {
 			if (tmp.isEmpty())
 				continue;
 			String temp[] = tmp.split("\\|");
@@ -88,10 +95,15 @@ public class TicketUtil {
 				trainQueryInfo.setHard_seat(isExistTicket(ticketInfo[13]));
 				trainQueryInfo.setNone_seat(isExistTicket(ticketInfo[14]));
 				trainQueryInfo.setOther_seat(isExistTicket(ticketInfo[15]));
-				String mmString = ticketInfo[16];
-				trainQueryInfo.setMmStr(getMMString(mmString)[10]);
-				trainQueryInfo.setTrainno4(getMMString(mmString)[3]);
-				trainQueryInfo.setYpInfoDetail(getMMString(mmString)[9]);
+				String infos = ticketInfo[16];
+				String[] trainInfo = getMMString(infos);
+				if (trainInfo.length > 0) {
+					trainQueryInfo.setMmStr(trainInfo[12]);
+					trainQueryInfo.setTrainno4(trainInfo[3]);
+					trainQueryInfo.setYpInfoDetail(trainInfo[11]);
+					trainQueryInfo.setFormStationNo(trainInfo[9]);
+					trainQueryInfo.setToStationNo(trainInfo[10]);
+				}
 				tqis.add(trainQueryInfo);
 			}
 		}
@@ -129,26 +141,6 @@ public class TicketUtil {
 		return startOrEnd;
 	}
 
-	// /**
-	// * 获取token
-	// *
-	// * @param html
-	// * @return String
-	// */
-	// public static void getToken(String html) {
-	// String regex = "TOKEN\" value=\"";
-	// Constants.TOKEN = html.substring(html.indexOf(regex) + regex.length(),
-	// html.indexOf(regex) + regex.length() + 32);
-	// logger.debug("token = " + Constants.TOKEN);
-	// }
-	//
-	// public static void getCredential(String html) {
-	// String regex = "name=\"leftTicketStr\" id=\"left_ticket\"";
-	// Constants.LEFTTICKETSTR = html.substring(html.indexOf(regex) +
-	// regex.length() + 9, html.indexOf(regex) + 86);
-	// logger.debug("leftTicketStr = " + Constants.LEFTTICKETSTR);
-	// }
-
 	public static void getToken(String content) {
 		Matcher m = Pattern.compile("(?is)<input .*?name=\"org.apache.struts.taglib.html.TOKEN\".*?value=\"(\\w+)\".*/?>").matcher(content);
 		if (m.find()) {
@@ -173,7 +165,7 @@ public class TicketUtil {
 	 */
 	private static String[] getMMString(String mmString) {
 		String[] mString = new String[20];
-		if (mmString.contains("class=\'yuding_u\'")) {
+		if (mmString.contains("class=\'btn130_2\'")) {
 			String regex = "getSelected(\'";
 			mString = mmString.substring(mmString.indexOf("regex") + regex.length(), mmString.indexOf("\')")).split("#");
 		}

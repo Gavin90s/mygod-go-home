@@ -213,30 +213,31 @@ public class ClientCore {
 		return responseBody;
 	}
 
-	/**
-	 * 获取TOKEN 提交订单需要
-	 * 
-	 * @return String
-	 * @throws KeyManagementException
-	 * @throws NoSuchAlgorithmException
-	 */
-	public static void getToken() throws KeyManagementException, NoSuchAlgorithmException {
-		logger.debug("-------------------getToken start-------------------");
-		HttpClient httpclient = getHttpClient();
-		HttpGet get = getHttpGet(Constants.GET_URL_USERTOKEN);
-		ResponseHandler<String> responseHandler = new BasicResponseHandler();
-		try {
-			String responseBody = httpclient.execute(get, responseHandler);
-			logger.debug("Respone is " + responseBody);
-			TicketUtil.getToken(responseBody);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			httpclient.getConnectionManager().shutdown();
-		}
-		logger.debug("-------------------getToken end-------------------");
-	}
+	// /**
+	// * 获取TOKEN 提交订单需要
+	// *
+	// * @return String
+	// * @throws KeyManagementException
+	// * @throws NoSuchAlgorithmException
+	// */
+	// public static void getToken() throws KeyManagementException,
+	// NoSuchAlgorithmException {
+	// logger.debug("-------------------getToken start-------------------");
+	// HttpClient httpclient = getHttpClient();
+	// HttpGet get = getHttpGet(Constants.GET_URL_USERTOKEN);
+	// ResponseHandler<String> responseHandler = new BasicResponseHandler();
+	// try {
+	// String responseBody = httpclient.execute(get, responseHandler);
+	// logger.debug("Respone is " + responseBody);
+	// TicketUtil.getToken(responseBody);
+	// } catch (Exception e) {
+	// logger.warn(e.getMessage());
+	// e.printStackTrace();
+	// } finally {
+	// httpclient.getConnectionManager().shutdown();
+	// }
+	// logger.debug("-------------------getToken end-------------------");
+	// }
 
 	/**
 	 * 查询列车信息
@@ -302,10 +303,11 @@ public class ClientCore {
 		// 创建客户端
 		HttpClient httpclient = getHttpClient();
 		HttpPost post = getHttpPost(Constants.POST_URL_SUBMUTORDERREQUEST);
-		// 提交预定的车次 一共22个参数
+		// 提交预定的车次 一共24个参数
 		List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 		parameters.add(new BasicNameValuePair(Constants.ORDER_ARRIVE_TIME, trainQueryInfo.getEndTime()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_FROM_STATION_NAME, trainQueryInfo.getFromStation()));
+		parameters.add(new BasicNameValuePair(Constants.ORDER_FROM_STATION_NO, trainQueryInfo.getFormStationNo()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_FROM_STATION_TELECODE, trainQueryInfo.getFromStationCode()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_FROM_STATION_TELECODE_NAME, trainQueryInfo.getFromStation()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_INCLUDE_STUDENT, orderRequest.getIncludeStudent()));
@@ -318,6 +320,7 @@ public class ClientCore {
 		parameters.add(new BasicNameValuePair(Constants.ORDER_START_TIME_STR, orderRequest.getStart_time_str()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_STATION_TRAIN_CODE, trainQueryInfo.getTrainNo()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TO_STATION_NAME, trainQueryInfo.getToStation()));
+		parameters.add(new BasicNameValuePair(Constants.ORDER_TO_STATION_NO, trainQueryInfo.getToStationNo()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TO_STATION_TELECODE, trainQueryInfo.getToStationCode()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TO_STATION_TELECODE_NAME, trainQueryInfo.getToStation()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TRAIN_CLASS_ARR, orderRequest.getTrainClass()));

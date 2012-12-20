@@ -57,10 +57,7 @@ public class TicketThread extends Thread {
 	public void run() {
 		mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.stop"));
 		while (!isSuccess) {
-			if (mainWin.isOnclick % 2 != 0) {
-				mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
-				break;
-			}
+			mainWin.isRunThread = true;
 			try {
 				// 查询火车信息
 				trainQueryInfoList = ClientCore.queryTrain(req);
@@ -134,6 +131,7 @@ public class TicketThread extends Thread {
 							}
 							if (msg.contains("Y")) {
 								isSuccess = true;
+								mainWin.isRunThread = false;
 								mainWin.showMsg("订票成功!");
 								mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
 							}

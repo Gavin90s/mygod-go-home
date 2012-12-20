@@ -115,6 +115,7 @@ public class Constants {
 	/**************** 提交订单相关参数 *********************/
 	public static final String ORDER_ARRIVE_TIME = "arrive_time";
 	public static final String ORDER_FROM_STATION_NAME = "from_station_name";
+	public static final String ORDER_FROM_STATION_NO = "from_station_no";
 	public static final String ORDER_FROM_STATION_TELECODE = "from_station_telecode";
 	public static final String ORDER_FROM_STATION_TELECODE_NAME = "from_station_telecode_name";
 	public static final String ORDER_INCLUDE_STUDENT = "include_student";
@@ -127,6 +128,7 @@ public class Constants {
 	public static final String ORDER_START_TIME_STR = "start_time_str";
 	public static final String ORDER_STATION_TRAIN_CODE = "station_train_code";
 	public static final String ORDER_TO_STATION_NAME = "to_station_name";
+	public static final String ORDER_TO_STATION_NO = "to_station_no";
 	public static final String ORDER_TO_STATION_TELECODE = "to_station_telecode";
 	public static final String ORDER_TO_STATION_TELECODE_NAME = "to_station_telecode_name";
 	public static final String ORDER_TRAIN_CLASS_ARR = "train_class_arr";

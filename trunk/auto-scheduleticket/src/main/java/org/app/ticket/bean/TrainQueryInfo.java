@@ -22,6 +22,8 @@ public class TrainQueryInfo {
 	private String toStationCode;// 到站code
 	private String endTime; // 到时
 	private String takeTime;// 历时
+	private String formStationNo; // 发站编号
+	private String toStationNo; // 到站编号
 
 	private String buss_seat; // 商务座
 	private String best_seat;// 特等座(余票)
@@ -118,6 +120,22 @@ public class TrainQueryInfo {
 
 	public void setTakeTime(String takeTime) {
 		this.takeTime = takeTime;
+	}
+
+	public String getFormStationNo() {
+		return formStationNo;
+	}
+
+	public void setFormStationNo(String formStationNo) {
+		this.formStationNo = formStationNo;
+	}
+
+	public String getToStationNo() {
+		return toStationNo;
+	}
+
+	public void setToStationNo(String toStationNo) {
+		this.toStationNo = toStationNo;
 	}
 
 	public String getBuss_seat() {
@@ -263,6 +281,10 @@ public class TrainQueryInfo {
 		builder.append(endTime);
 		builder.append(", takeTime=");
 		builder.append(takeTime);
+		builder.append(", formStationNo=");
+		builder.append(formStationNo);
+		builder.append(", toStationNo=");
+		builder.append(toStationNo);
 		builder.append(", buss_seat=");
 		builder.append(buss_seat);
 		builder.append(", best_seat=");

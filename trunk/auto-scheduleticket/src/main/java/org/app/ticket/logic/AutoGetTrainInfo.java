@@ -35,7 +35,7 @@ public class AutoGetTrainInfo {
 	private MainWin mainWin;
 	// 存放指定的列车
 	private String[] specificTrainKeys;
-
+	// 获取指定的座位席别
 	private String[] specificTrainSeat;
 
 	private static Map seatMap = null;
@@ -80,7 +80,7 @@ public class AutoGetTrainInfo {
 				break;
 			}
 			for (int i = trainQueryInfoList.size() - 1; i >= 0; i--) {
-				if (specificTrainKeys[j].equals(trainQueryInfoList.get(i).getTrainNo())) {
+				if (specificTrainKeys[j].equalsIgnoreCase(trainQueryInfoList.get(i).getTrainNo())) {
 					// 存放指定的车
 					specificTrains.put(trainQueryInfoList.get(i).getTrainNo(), trainQueryInfoList.get(i));
 					trainQueryInfoList.remove(i);
@@ -96,18 +96,22 @@ public class AutoGetTrainInfo {
 			}
 		}
 
+		// 指定列车信息
 		String specificTrain = "";
 		for (Map.Entry<String, TrainQueryInfo> key : specificTrains.entrySet()) {
 			specificTrain += ((TrainQueryInfo) key.getValue()).getTrainNo() + ",";
 		}
+		// 指定列车之外有票列车
 		String specificSeatTrain = "";
 		for (Map.Entry<String, TrainQueryInfo> key : specificSeatTrains.entrySet()) {
 			specificSeatTrain += ((TrainQueryInfo) key.getValue()).getTrainNo() + ",";
 		}
+		// 指定列车信息日志
 		if (!StringUtil.isEmptyString(specificTrain)) {
 			mainWin.messageOut.setText(mainWin.messageOut.getText() + "您指定的列车为:" + specificTrain.substring(0, specificTrain.length() - 1) + "\n");
 			logger.debug("指定列车信息:" + specificTrain.substring(0, specificTrain.length() - 1));
 		}
+		// 指定列车之外有票列车日志
 		if (!StringUtil.isEmptyString(specificSeatTrain)) {
 			mainWin.messageOut.setText(mainWin.messageOut.getText() + "指定之外的列车为:" + specificSeatTrain.substring(0, specificSeatTrain.length() - 1) + "\n");
 			logger.debug("指定之外列车信息:" + specificSeatTrain.substring(0, specificSeatTrain.length() - 1));
@@ -122,63 +126,50 @@ public class AutoGetTrainInfo {
 	public TrainQueryInfo getSeattrainQueryInfo() {
 		boolean isAssign = false;
 		TrainQueryInfo returninfo = null;
-		// 指定了车次
-		if (specificTrainKeys.length > 0&&!StringUtil.isEmptyString(specificTrainKeys[0])) {
+		// 指定了车次 -> 先进入指定车次选择，指定车次列车无票 则预定有票非指定的列车
+		if (specificTrainKeys.length > 0 && !StringUtil.isEmptyString(specificTrainKeys[0])) {
 			for (int i = 0; i < specificTrainKeys.length; i++) {
 				TrainQueryInfo info = specificTrains.get(specificTrainKeys[i]);
-				// 勾选动车优先
-				if (mainWin.isBoxkTwoSeat()) {
-					if (!Constants.SYS_TICKET_SIGN_1.equals(info.getTwo_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getTwo_seat())) {
-						try {
-							if (Integer.parseInt(info.getTwo_seat()) >= userInfoList.size()) {
-								returninfo = info;
-								isAssign = true;
-								setUserSest(userInfoList, Constants.TWO_SEAT);
-								logger.debug("动车优先车次为:" + info.getTrainCode());
-								break;
-							}
-						} catch (NumberFormatException ex) {
-							returninfo = info;
-							isAssign = true;
-							setUserSest(userInfoList, Constants.TWO_SEAT);
-							logger.debug("动车优先车次为:" + info.getTrainCode());
-							break;
-						}
-					}
-				}
-				// 勾选卧铺优先
-				if (mainWin.isHardSleePer()) {
-					if (!Constants.SYS_TICKET_SIGN_1.equals(info.getHard_sleeper()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getHard_sleeper())) {
-						try {
-							if (Integer.parseInt(info.getHard_sleeper()) >= userInfoList.size()) {
-								returninfo = info;
-								isAssign = true;
-								setUserSest(userInfoList, Constants.HARD_SLEEPER);
-								logger.debug("卧铺优先车次为:" + info.getTrainCode());
-								break;
-							}
-						} catch (NumberFormatException ex) {
-							returninfo = info;
-							isAssign = true;
-							setUserSest(userInfoList, Constants.HARD_SLEEPER);
-							logger.debug("卧铺优先车次为:" + info.getTrainCode());
-							break;
-						}
-					}
-				}
 				returninfo = getSeattrainQueryInfo(info);
-				isAssign = true;
+				if (returninfo != null) {
+					return returninfo;
+				}
 			}
-			return returninfo;
 		}
 
 		// 未指定车次
 		if (!isAssign) {
 			for (Map.Entry<String, TrainQueryInfo> map : specificSeatTrains.entrySet()) {
 				TrainQueryInfo info = getSeattrainQueryInfo(map.getValue());
-				if (info != null) {
+				if (info != null) { // 自动选择列车
 					returninfo = info;
-					logger.debug("车次为:" + info.getTrainNo());
+					mainWin.messageOut.setText(mainWin.messageOut.getText() + "最终车次为:" + info.getTrainNo() + "\n");
+					return returninfo;
+				}
+			}
+
+			// 指定列车和非指定列车均无有座席别 则查看指定列车是否有无座票
+			for (Map.Entry<String, TrainQueryInfo> map : specificTrains.entrySet()) {
+				TrainQueryInfo info = map.getValue();
+				String seat = Constants.NONE_SEAT;
+				boolean isTicket = checkSeatIsTicket(map.getValue().getNone_seat());
+				if (!isTicket) { // 自动选择无座列车
+					returninfo = info;
+					mainWin.messageOut.setText(mainWin.messageOut.getText() + "指定列车和未指定列车均无有座位票!\n");
+					mainWin.messageOut.setText(mainWin.messageOut.getText() + "自动指定车次为:" + info.getTrainNo() + " ----- 自动选择席别为:" + seatMap.get(seat) + "\n");
+					return returninfo;
+				}
+			}
+
+			// 指定列车和非指定列车均无有座席别 则查看非指定是否有无座票
+			for (Map.Entry<String, TrainQueryInfo> map : specificSeatTrains.entrySet()) {
+				TrainQueryInfo info = map.getValue();
+				String seat = Constants.NONE_SEAT;
+				boolean isTicket = checkSeatIsTicket(map.getValue().getNone_seat());
+				if (!isTicket) { // 自动选择无座列车
+					returninfo = info;
+					mainWin.messageOut.setText(mainWin.messageOut.getText() + "指定列车和未指定列车均无有座位票!\n");
+					mainWin.messageOut.setText(mainWin.messageOut.getText() + "自动未指定车次为:" + info.getTrainNo() + " ----- 自动选择席别为:" + seatMap.get(seat) + "\n");
 					return returninfo;
 				}
 			}
@@ -187,7 +178,7 @@ public class AutoGetTrainInfo {
 	}
 
 	/**
-	 * 席别选择 (二等座 -> 一等座 -> 硬卧 -> 软卧 -> 软座 -> 硬座-> 高级软卧 -> 特等座 -> 商务座 -> 无座 )
+	 * 席别自动选择 (二等座 -> 一等座 -> 硬卧 -> 软卧 -> 软座 -> 硬座-> 高级软卧 -> 特等座 -> 商务座)
 	 * 
 	 * @param trainQueryInfo
 	 * @return TrainQueryInfo
@@ -195,20 +186,27 @@ public class AutoGetTrainInfo {
 	public TrainQueryInfo getSeattrainQueryInfo(TrainQueryInfo info) {
 		String seat = "";
 		// 指定了座位席别
-		if (specificTrainSeat.length > 0&&!StringUtil.isEmptyString(specificTrainSeat[0])) {
+		if (specificTrainSeat.length > 0 && !StringUtil.isEmptyString(specificTrainSeat[0])) {
 			for (int i = 0; i < specificTrainSeat.length; i++) {
 				seat = specificTrainSeat[i];
 				try {
-					if (Integer.parseInt(info.getTwo_seat()) >= userInfoList.size()) {
+					// 指定列车票等于无或者--
+					String seatCount = getSeatCount(seat, info);
+					if (checkSeatIsTicket(seatCount)) {
+						continue;
+					}
+					if (Integer.parseInt(seatCount) >= userInfoList.size()) {
 						setUserSest(userInfoList, specificTrainSeat[i]);
+						mainWin.messageOut.setText(mainWin.messageOut.getText() + "您指定的座位席别为:" + seatMap.get(seat) + "\n");
 						return info;
 					}
 				} catch (NumberFormatException ex) {
 					setUserSest(userInfoList, specificTrainSeat[i]);
+					mainWin.messageOut.setText(mainWin.messageOut.getText() + "您指定的座位席别为:" + seatMap.get(seat) + "\n");
 					return info;
 				}
+
 			}
-			mainWin.messageOut.setText(mainWin.messageOut.getText() + "您指定的作为席别为:" + seatMap.get(seat) + "\n");
 		}
 
 		// 勾选动车优先
@@ -253,7 +251,7 @@ public class AutoGetTrainInfo {
 			}
 		}
 
-		// 未指定作为席别 则按照座位顺序席别选取座位席别
+		// 未指定座位席别 则按照座位顺序席别选取座位席别
 		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getTwo_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getTwo_seat())) {
 			try {
 				if (Integer.parseInt(info.getTwo_seat()) >= userInfoList.size()) {
@@ -397,22 +395,6 @@ public class AutoGetTrainInfo {
 				return info;
 			}
 		}
-
-		if (!Constants.SYS_TICKET_SIGN_1.equals(info.getNone_seat()) && !Constants.SYS_TICKET_SIGN_2.equals(info.getNone_seat())) {
-			try {
-				if (Integer.parseInt(info.getNone_seat()) >= userInfoList.size()) {
-					seat = Constants.NONE_SEAT;
-					setUserSest(userInfoList, Constants.NONE_SEAT);
-					mainWin.messageOut.setText(mainWin.messageOut.getText() + "自动选择的席别为:" + seatMap.get(seat) + "\n");
-					return info;
-				}
-			} catch (NumberFormatException ex) {
-				seat = Constants.NONE_SEAT;
-				setUserSest(userInfoList, Constants.NONE_SEAT);
-				mainWin.messageOut.setText(mainWin.messageOut.getText() + "自动选择的席别为:" + seatMap.get(seat) + "\n");
-				return info;
-			}
-		}
 		return null;
 	}
 
@@ -435,7 +417,7 @@ public class AutoGetTrainInfo {
 	}
 
 	/**
-	 * 席别选择
+	 * 对用户席别赋值
 	 * 
 	 * @param userInfoList
 	 * @param seat
@@ -443,6 +425,46 @@ public class AutoGetTrainInfo {
 	private void setUserSest(List<UserInfo> userInfoList, String seat) {
 		for (UserInfo info : userInfoList) {
 			info.setSeatType(seat);
+		}
+	}
+
+	/**
+	 * 检查是否有票
+	 * 
+	 * @param seat
+	 * @return
+	 */
+	private boolean checkSeatIsTicket(String seat) {
+		return StringUtil.isEqualString(Constants.SYS_TICKET_SIGN_1, seat) || StringUtil.isEqualString(Constants.SYS_TICKET_SIGN_2, seat);
+	}
+
+	/**
+	 * 选取席别
+	 * 
+	 * @param seat
+	 * @param info
+	 */
+	private String getSeatCount(String seat, TrainQueryInfo info) {
+		if (StringUtil.isEqualString("P", seat)) {
+			return info.getBuss_seat();
+		} else if (StringUtil.isEqualString("M", seat)) {
+			return info.getOne_seat();
+		} else if (StringUtil.isEqualString("O", seat)) {
+			return info.getTwo_seat();
+		} else if (StringUtil.isEqualString("6", seat)) {
+			return info.getVag_sleeper();
+		} else if (StringUtil.isEqualString("4", seat)) {
+			return info.getSoft_sleeper();
+		} else if (StringUtil.isEqualString("3", seat)) {
+			return info.getHard_sleeper();
+		} else if (StringUtil.isEqualString("2", seat)) {
+			return info.getSoft_seat();
+		} else if (StringUtil.isEqualString("1", seat)) {
+			return info.getHard_seat();
+		} else if (StringUtil.isEqualString("-1", seat)) {
+			return info.getNone_seat();
+		} else {
+			return info.getOther_seat();
 		}
 	}
 }

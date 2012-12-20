@@ -3,6 +3,8 @@ package org.app.ticket.core;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -113,7 +115,7 @@ public class MainWin extends JFrame {
 	public String submitUrl;
 	public static boolean isLogin = false;
 	private static String tessPath = null;
-	public int isOnclick = 1;
+	public boolean isRunThread = false;
 
 	// 静态构造块
 	static {
@@ -207,8 +209,10 @@ public class MainWin extends JFrame {
 
 		code = new JLabel();
 		code.setBounds(340, 20, 60, 20);
+		code.setToolTipText("点我刷新验证码！");
 		panel_o.add(code);
 		code.setHorizontalAlignment(SwingConstants.RIGHT);
+		code.addMouseListener(new codeClick());
 
 		authcode = new JTextField();
 		authcode.setToolTipText(ResManager.getString("RobotTicket.label.codename"));
@@ -509,6 +513,12 @@ public class MainWin extends JFrame {
 	public MainWin() {
 		// 初始话布局
 		initLayout();
+		// 获取cookie
+		try {
+			ClientCore.getCookie();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 		// 初始化登录验证码
 		initLoginImage();
 		this.mainWin = this;
@@ -528,15 +538,43 @@ public class MainWin extends JFrame {
 			if (!file.exists()) {
 				file.mkdirs();
 			}
+			// 启动未获取到cookie的情况
+			if (StringUtil.isEmptyString(Constants.JSESSIONID_VALUE) && StringUtil.isEmptyString(Constants.BIGIPSERVEROTSWEB_VALUE)) {
+				ClientCore.getCookie();
+			}
 			loginUrl += "passcode-login.jpg";
 			submitUrl = path + "image" + File.separator + "passcode-submit.jpg";
-			// 获取cookie
-			ClientCore.getCookie();
 			ClientCore.getPassCode(Constants.GET_LOGINURL_PASSCODE, loginUrl);
 			code.setIcon(ToolUtil.getImageIcon(loginUrl));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	// 单击刷新验证码
+	class codeClick implements MouseListener {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			initLoginImage();
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+
 	}
 
 	// 登录按钮onclick事件监听
@@ -604,7 +642,6 @@ public class MainWin extends JFrame {
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			isOnclick++;
 			JButton btn = (JButton) e.getSource();
 			if (ResManager.getString("RobotTicket.btn.start").equals(btn.getText())) {
 				List list = getUserInfo();
@@ -631,12 +668,13 @@ public class MainWin extends JFrame {
 
 				// 获取列车查询实体
 				getOrderRequest();
-				if (isOnclick % 2 == 0) {
-					if (loginAuto.isSelected() && isAutoCode.isSelected()) {
-						new SubmitThread(userInfoList, req, mainWin).start();
-					} else {
-						new TicketThread(userInfoList, req, mainWin).start();
-					}
+				if (isRunThread) {
+					showMsg("订票线程已启动!");
+				}
+				if (loginAuto.isSelected() && isAutoCode.isSelected()) {
+					new SubmitThread(userInfoList, req, mainWin).start();
+				} else {
+					new TicketThread(userInfoList, req, mainWin).start();
 				}
 			}
 		}

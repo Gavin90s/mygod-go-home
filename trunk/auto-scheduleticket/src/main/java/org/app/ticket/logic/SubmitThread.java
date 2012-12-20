@@ -133,10 +133,10 @@ public class SubmitThread extends Thread {
 
 				while (true) {
 					if (mainWin.isLogin) {
-						if (mainWin.isOnclick % 2 != 0) {
-							mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
-							break;
-						}
+						// if (mainWin.isOnclick % 2 != 0) {
+						// mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
+						// break;
+						// }
 						// 查询火车信息
 						trainQueryInfoList = ClientCore.queryTrain(req);
 						mainWin.messageOut.setText(mainWin.messageOut.getText() + "火车信息\n");
