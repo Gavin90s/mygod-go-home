@@ -1,24 +1,32 @@
 package org.app.ticket.util;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
+import org.app.ticket.autoimg.ImageFilter;
 import org.app.ticket.constants.Constants;
+import org.app.ticket.core.ClientCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,6 +148,39 @@ public class ToolUtil {
 					jpf.setText(userMap.get(jpf.getName()) == null ? "" : userMap.get(jpf.getName()));
 				}
 			}
+		}
+	}
+
+	public static void filterImage(String uri) throws IOException {
+		FileInputStream fin = new FileInputStream(uri);
+		BufferedImage bi = ImageIO.read(fin);
+		ImageFilter flt = new ImageFilter(bi);
+		flt.changeGrey();
+		flt.getMedian();
+		flt.getGrey();
+		flt.getBrighten();
+		bi = flt.getProcessedImg();
+
+		File file = new File(uri);
+		ImageIO.write(bi, "jpg", file);
+	}
+
+	public static void getLoginImage(String i) throws KeyManagementException, NoSuchAlgorithmException {
+		String url = Constants.GET_LOGINURL_PASSCODE + "&";
+		double f = 0.0000000000000001f;
+		Random random = new Random();
+		f = random.nextDouble();
+		url += f;
+		ClientCore.getPassCode(url, "F:\\image\\f_" + i + ".jpg");
+	}
+
+	public static void main(String[] arg0) {
+		try {
+			for (int i = 0; i < 1000; i++) {
+				getLoginImage(String.valueOf(i));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

@@ -670,6 +670,7 @@ public class MainWin extends JFrame {
 				getOrderRequest();
 				if (isRunThread) {
 					showMsg("订票线程已启动!");
+					return;
 				}
 				if (loginAuto.isSelected() && isAutoCode.isSelected()) {
 					new SubmitThread(userInfoList, req, mainWin).start();

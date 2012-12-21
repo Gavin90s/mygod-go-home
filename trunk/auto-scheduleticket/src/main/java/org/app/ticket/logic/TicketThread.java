@@ -69,6 +69,12 @@ public class TicketThread extends Thread {
 				}
 				// 获取火车信息
 				trainQueryInfo = (new AutoGetTrainInfo(trainQueryInfoList, mainWin, userInfos)).getSeattrainQueryInfo();
+				if (trainQueryInfo == null) {
+					mainWin.showMsg("指定列车和非指定列车均无票,请通过其它途径购买或稍后在尝试!");
+					mainWin.isRunThread = false;
+					mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
+					break;
+				}
 				// 第二步 提交预定车次信息(获取重定向地址中的URL和LEFTTICKETSTR)
 				ClientCore.submitOrderRequest(trainQueryInfo, req);
 				if (mainWin.isAutoCode.isSelected()) {

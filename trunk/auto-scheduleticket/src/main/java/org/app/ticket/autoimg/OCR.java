@@ -30,8 +30,8 @@ public class OCR {
 		cmd.add("");
 		cmd.add(outputFile.getName());
 		cmd.add(LANG_OPTION);
-		cmd.add("chi_sim");
-		// cmd.add("eng");
+		// cmd.add("chi_sim");
+		cmd.add("eng");
 
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.directory(imageFile.getParentFile());

@@ -10,6 +10,7 @@ import org.app.ticket.bean.LoginDomain;
 import org.app.ticket.constants.Constants;
 import org.app.ticket.core.ClientCore;
 import org.app.ticket.core.MainWin;
+import org.app.ticket.util.StringUtil;
 import org.app.ticket.util.ToolUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,9 @@ public class LoginThread extends Thread {
 			LoginDomain login = null;
 			if (!mainWin.loginAuto.isSelected()) {
 				String loginRand = getLoginRand();
+				while (StringUtil.isEmptyString(loginRand)) {
+					loginRand = getLoginRand();
+				}
 				login = new LoginDomain(loginRand, mainWin.username.getText(), mainWin.authcode.getText(), "Y", "N", mainWin.password.getText());
 				String loginStr = ClientCore.Login(login);
 				if (loginStr.contains("欢迎您登录中国铁路客户服务中心网站")) {
@@ -66,16 +70,18 @@ public class LoginThread extends Thread {
 					Random random = new Random();
 					f = random.nextDouble();
 					url += f;
-					System.out.println("url = " + url);
 					ClientCore.getPassCode(url, mainWin.loginUrl);
 
 					String loginRand = getLoginRand();
 
-					logger.debug("-----------loginRand=" + loginRand);
+					if (loginRand == null) {
+						continue;
+					}
 
+					logger.debug("-----------loginRand=" + loginRand);
+					// ToolUtil.filterImage(mainWin.loginUrl);
 					// 设置背景图片
 					mainWin.code.setIcon(ToolUtil.getImageIcon(mainWin.loginUrl));
-
 					// 识别验证码
 					String valCode = new OCR().recognizeText(tessPath, new File(mainWin.loginUrl), "jpg");
 					valCode = valCode.replaceAll(" ", "").replaceAll("\n", "").replaceAll("\r", "");
@@ -95,7 +101,7 @@ public class LoginThread extends Thread {
 
 					++sum;
 					String loginStr = ClientCore.Login(login);
-					if (loginStr.contains("您最后一次登录时间为")) {
+					if (loginStr.contains("欢迎您登录中国铁路客户服务中心网站")) {
 						islogin = true;
 						mainWin.isLogin = true;
 						break;
