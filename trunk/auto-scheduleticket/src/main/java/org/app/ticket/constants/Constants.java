@@ -41,10 +41,14 @@ public class Constants {
 	public static final String GET_URL_CONFIRMPASSENGER = "http://dynamic.12306.cn/otsweb/order/confirmPassengerAction.do?method=init";
 	// 获取火车票数量
 	public static final String GET_URL_GETQUEUECOUNT = "http://dynamic.12306.cn/otsweb/order/confirmPassengerAction.do?method=getQueueCount";
+	// 检查订单URL
+	public static final String POST_URL_CHECKORDERINFO = "http://dynamic.12306.cn/otsweb/order/confirmPassengerAction.do?method=checkOrderInfo&rand=";
 	// 提交订单信息
 	public static final String POST_URL_CONFIRMSINGLEFORQUEUEORDER = "http://dynamic.12306.cn/otsweb/order/confirmPassengerAction.do?method=confirmSingleForQueueOrder";
 	// &
 	public static final String SIGN = "&";
+	// rand
+	public static final String RAND = "rand";
 	// 火车票信息
 	public static final String TICKET_INFO = "--";
 
@@ -120,6 +124,7 @@ public class Constants {
 	public static final String ORDER_FROM_STATION_TELECODE_NAME = "from_station_telecode_name";
 	public static final String ORDER_INCLUDE_STUDENT = "include_student";
 	public static final String ORDER_LISHI = "lishi";
+	public static final String ORDER_LOCATIONCODE = "locationCode";
 	public static final String ORDER_MMSTR = "mmStr";
 	public static final String ORDER_ROUND_START_TIME_STR = "round_start_time_str";
 	public static final String ORDER_ROUND_TRAIN_DATE = "round_train_date";
@@ -163,5 +168,6 @@ public class Constants {
 	public static final String SUBMIT_PASSENGERTICKETS = "passengerTickets";
 	public static final String SUBMIT_RANDCODE = "randCode";
 	public static final String SUBMIT_TEXTFIELD = "textfield";
+	public static final String SUBMIT_TFLAG = "dc";
 
 }

@@ -77,10 +77,12 @@ public class TicketUtil {
 				trainQueryInfo.setTrainNo(ticketInfo[1].substring(ticketInfo[1].lastIndexOf("\'>") + 2, ticketInfo[1].lastIndexOf("</span>")));
 				String startstation = isStartOrEndStation(ticketInfo[2]);
 				trainQueryInfo.setFromStation(startstation.substring(0, startstation.lastIndexOf("<br>")));
+				trainQueryInfo.setFromStationName(convertStation(trainQueryInfo.getFromStation()));
 				trainQueryInfo.setFromStationCode(TicketUtil.getCityCode(startstation.substring(0, startstation.lastIndexOf("<br>"))));
 				trainQueryInfo.setStartTime(startstation.substring(startstation.lastIndexOf("<br>") + 4, startstation.length()));
 				String endstation = isStartOrEndStation(ticketInfo[3]);
 				trainQueryInfo.setToStation(endstation.substring(0, endstation.lastIndexOf("<br>")));
+				trainQueryInfo.setToStationName(convertStation(trainQueryInfo.getToStation()));
 				trainQueryInfo.setToStationCode(TicketUtil.getCityCode(endstation.substring(0, endstation.lastIndexOf("<br>"))));
 				trainQueryInfo.setEndTime(endstation.substring(endstation.lastIndexOf("<br>") + 4, endstation.length()));
 				trainQueryInfo.setTakeTime(ticketInfo[4]);
@@ -103,6 +105,7 @@ public class TicketUtil {
 					trainQueryInfo.setYpInfoDetail(trainInfo[11]);
 					trainQueryInfo.setFormStationNo(trainInfo[9]);
 					trainQueryInfo.setToStationNo(trainInfo[10]);
+					trainQueryInfo.setLocationCode(trainInfo[13]);
 				}
 				tqis.add(trainQueryInfo);
 			}
@@ -172,4 +175,14 @@ public class TicketUtil {
 		return mString;
 	}
 
+	// 站点名转换
+	private static String convertStation(String stationName) {
+		int length = stationName.length();
+		String station = stationName.substring(0, length - 1);
+		String stationcode = getCityCode(station);
+		if (stationcode != null) {
+			return station;
+		}
+		return stationName;
+	}
 }

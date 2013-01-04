@@ -303,18 +303,19 @@ public class ClientCore {
 		// 创建客户端
 		HttpClient httpclient = getHttpClient();
 		HttpPost post = getHttpPost(Constants.POST_URL_SUBMUTORDERREQUEST);
-		// 提交预定的车次 一共24个参数
+		// 提交预定的车次 一共25个参数
 		List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 		parameters.add(new BasicNameValuePair(Constants.ORDER_ARRIVE_TIME, trainQueryInfo.getEndTime()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_FROM_STATION_NAME, trainQueryInfo.getFromStation()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_FROM_STATION_NO, trainQueryInfo.getFormStationNo()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_FROM_STATION_TELECODE, trainQueryInfo.getFromStationCode()));
-		parameters.add(new BasicNameValuePair(Constants.ORDER_FROM_STATION_TELECODE_NAME, trainQueryInfo.getFromStation()));
+		parameters.add(new BasicNameValuePair(Constants.ORDER_FROM_STATION_TELECODE_NAME, trainQueryInfo.getFromStationName()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_INCLUDE_STUDENT, orderRequest.getIncludeStudent()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_LISHI, trainQueryInfo.getTakeTime()));
+		parameters.add(new BasicNameValuePair(Constants.ORDER_LOCATIONCODE, trainQueryInfo.getLocationCode()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_MMSTR, trainQueryInfo.getMmStr()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_ROUND_START_TIME_STR, orderRequest.getStart_time_str()));
-		parameters.add(new BasicNameValuePair(Constants.ORDER_ROUND_TRAIN_DATE, orderRequest.getQuery_date()));
+		parameters.add(new BasicNameValuePair(Constants.ORDER_ROUND_TRAIN_DATE, orderRequest.getTrain_date()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_SEATTYPE_NUM, orderRequest.getSeatTypeAndNum()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_SINGLE_ROUND_TYPE, trainQueryInfo.getSingle_round_type()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_START_TIME_STR, orderRequest.getStart_time_str()));
@@ -322,7 +323,7 @@ public class ClientCore {
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TO_STATION_NAME, trainQueryInfo.getToStation()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TO_STATION_NO, trainQueryInfo.getToStationNo()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TO_STATION_TELECODE, trainQueryInfo.getToStationCode()));
-		parameters.add(new BasicNameValuePair(Constants.ORDER_TO_STATION_TELECODE_NAME, trainQueryInfo.getToStation()));
+		parameters.add(new BasicNameValuePair(Constants.ORDER_TO_STATION_TELECODE_NAME, trainQueryInfo.getToStationName()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TRAIN_CLASS_ARR, orderRequest.getTrainClass()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TRAIN_DATE, orderRequest.getTrain_date()));
 		parameters.add(new BasicNameValuePair(Constants.ORDER_TRAIN_PASS_TYPE, orderRequest.getTrainPassType()));
@@ -331,6 +332,11 @@ public class ClientCore {
 		parameters.add(new BasicNameValuePair(Constants.ORDER_YPINFODETAIL, trainQueryInfo.getYpInfoDetail()));
 		String responseBody;
 		try {
+			String p = "";
+			for (NameValuePair n : parameters) {
+				p += n.getName() + " => " + n.getValue() + " ";
+			}
+			logger.debug("submitOrderRequest params : " + p);
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters, HTTP.UTF_8);
 			logger.debug(Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER + Constants.SIGN + URLEncodedUtils.format(parameters, HTTP.UTF_8));
 			post.setEntity(uef);
@@ -456,12 +462,20 @@ public class ClientCore {
 	 * @throws KeyManagementException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public static String confirmSingleForQueueOrder(TrainQueryInfo trainQueryInfo, OrderRequest orderRequest, List<UserInfo> userInfoList, String randCode) throws KeyManagementException, NoSuchAlgorithmException {
+	public static String confirmSingleForQueueOrder(TrainQueryInfo trainQueryInfo, OrderRequest orderRequest, List<UserInfo> userInfoList, String randCode, String url) throws KeyManagementException, NoSuchAlgorithmException {
 		logger.debug("-------------------confirmSingleForQueueOrder start-------------------");
 		// 创建客户端
 		HttpClient httpclient = getHttpClient();
 
-		HttpPost post = getHttpPost(Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER);
+		// 检查订单
+		boolean checkRand = checkRand(url);
+		if (checkRand) {
+			url += randCode;
+		}
+
+		logger.debug("url = " + url);
+
+		HttpPost post = getHttpPost(url);
 
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
@@ -511,7 +525,16 @@ public class ClientCore {
 		}
 		parameters.add(new BasicNameValuePair(Constants.SUBMIT_RANDCODE, randCode));
 		parameters.add(new BasicNameValuePair(Constants.SUBMIT_TEXTFIELD, "中文或拼音首字母"));
+		// 检查订单
+		if (checkRand) {
+			parameters.add(new BasicNameValuePair(Constants.SUBMIT_TFLAG, "dc"));
+		}
 		try {
+			String p = "";
+			for (NameValuePair n : parameters) {
+				p += n.getName() + " => " + n.getValue() + " ";
+			}
+			logger.debug("confirmSingleForQueueOrder params : " + p);
 			UrlEncodedFormEntity uef = new UrlEncodedFormEntity(parameters, HTTP.UTF_8);
 			logger.debug(Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER + Constants.SIGN + URLEncodedUtils.format(parameters, HTTP.UTF_8));
 			post.setEntity(uef);
@@ -543,5 +566,10 @@ public class ClientCore {
 			buffer.append(line + "\n");
 		is.close();
 		return buffer.toString();
+	}
+
+	// 是否检查订单
+	private static boolean checkRand(String url) {
+		return url.contains(Constants.RAND);
 	}
 }

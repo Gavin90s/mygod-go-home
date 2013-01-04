@@ -16,11 +16,14 @@ public class TrainQueryInfo {
 	private String trainNo; // 车次
 	private String trainDate; // 出发日期
 	private String fromStation;// 发站
+	private String fromStationName; // 发站中心火车站
 	private String fromStationCode; // 发站code
 	private String startTime;// 发时
 	private String toStation;// 到站
+	private String toStationName;// 到站中心火车站
 	private String toStationCode;// 到站code
 	private String endTime; // 到时
+	private String locationCode; // 位置code
 	private String takeTime;// 历时
 	private String formStationNo; // 发站编号
 	private String toStationNo; // 到站编号
@@ -112,6 +115,14 @@ public class TrainQueryInfo {
 
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
+	}
+
+	public String getLocationCode() {
+		return locationCode;
+	}
+
+	public void setLocationCode(String locationCode) {
+		this.locationCode = locationCode;
 	}
 
 	public String getTakeTime() {
@@ -256,6 +267,22 @@ public class TrainQueryInfo {
 
 	public void setSingle_round_type(String single_round_type) {
 		this.single_round_type = single_round_type;
+	}
+
+	public String getFromStationName() {
+		return fromStationName;
+	}
+
+	public void setFromStationName(String fromStationName) {
+		this.fromStationName = fromStationName;
+	}
+
+	public String getToStationName() {
+		return toStationName;
+	}
+
+	public void setToStationName(String toStationName) {
+		this.toStationName = toStationName;
 	}
 
 	@Override

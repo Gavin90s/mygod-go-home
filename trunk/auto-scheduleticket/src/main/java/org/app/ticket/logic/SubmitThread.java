@@ -158,7 +158,7 @@ public class SubmitThread extends Thread {
 						valCode = valCode.replaceAll(" ", "").replaceAll("\n", "").replaceAll("\r", "");
 						System.out.println("-------------valCode = " + valCode);
 
-						String msg = ClientCore.confirmSingleForQueueOrder(trainQueryInfo, req, userInfos, valCode);
+						String msg = ClientCore.confirmSingleForQueueOrder(trainQueryInfo, req, userInfos, valCode, null);
 
 						logger.debug("最后输出消息:" + valCode + "----------" + msg);
 						if (msg.contains("验证码")) {

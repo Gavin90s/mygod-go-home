@@ -482,8 +482,8 @@ public class MainWin extends JFrame {
 
 	public static void main(String[] arg0) {
 		// TODO
-		// tessPath = arg0[0];
-		tessPath = "D:\\Program Files\\Tesseract-OCR";
+		tessPath = arg0[0];
+		// tessPath = "D:\\Program Files\\Tesseract-OCR";
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -498,13 +498,13 @@ public class MainWin extends JFrame {
 
 		try {
 			// TODO
-			// File file = new File(path + "config.properties");
-			File file = new File("E:\\" + "config.properties");
+			File file = new File(path + "config.properties");
+			// File file = new File("E:\\" + "config.properties");
 			if (!file.exists()) {
 				return;
 			}
-			// ResManager.initProperties(path + "config.properties");
-			ResManager.initProperties("E:\\" + "config.properties");
+			ResManager.initProperties(path + "config.properties");
+			// ResManager.initProperties("E:\\" + "config.properties");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

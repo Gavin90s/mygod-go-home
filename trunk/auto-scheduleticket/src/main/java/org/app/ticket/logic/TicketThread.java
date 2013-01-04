@@ -126,14 +126,18 @@ public class TicketThread extends Thread {
 						} else {
 							try {
 								if (trainQueryInfo != null) {
-									msg = ClientCore.confirmSingleForQueueOrder(trainQueryInfo, req, userInfos, randcode);
+									// 检查订单
+									msg = ClientCore.confirmSingleForQueueOrder(trainQueryInfo, req, userInfos, randcode, Constants.POST_URL_CHECKORDERINFO);
+									logger.debug("最后输出消息:" + randcode + "----------" + msg);
+									if (msg.contains("验证码")) {
+										mainWin.messageOut.setText(mainWin.messageOut.getText() + "验证码错误！\n");
+									} else {
+										// 提交订单
+										msg = ClientCore.confirmSingleForQueueOrder(trainQueryInfo, req, userInfos, randcode, Constants.POST_URL_CONFIRMSINGLEFORQUEUEORDER);
+									}
 								}
 							} catch (Exception e) {
 								e.printStackTrace();
-							}
-							logger.debug("最后输出消息:" + randcode + "----------" + msg);
-							if (msg.contains("验证码")) {
-								mainWin.messageOut.setText(mainWin.messageOut.getText() + "验证码错误！\n");
 							}
 							if (msg.contains("Y")) {
 								isSuccess = true;
