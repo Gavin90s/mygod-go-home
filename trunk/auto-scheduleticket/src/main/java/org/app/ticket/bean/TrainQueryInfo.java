@@ -12,6 +12,7 @@ package org.app.ticket.bean;
  * 
  */
 public class TrainQueryInfo {
+
 	private String trainCode;// 序号
 	private String trainNo; // 车次
 	private String trainDate; // 出发日期

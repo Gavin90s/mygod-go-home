@@ -130,7 +130,9 @@ public class AutoGetTrainInfo {
 		if (specificTrainKeys.length > 0 && !StringUtil.isEmptyString(specificTrainKeys[0])) {
 			for (int i = 0; i < specificTrainKeys.length; i++) {
 				TrainQueryInfo info = specificTrains.get(specificTrainKeys[i]);
-				returninfo = getSeattrainQueryInfo(info);
+				if (info != null) {
+					returninfo = getSeattrainQueryInfo(info);
+				}
 				if (returninfo != null) {
 					return returninfo;
 				}

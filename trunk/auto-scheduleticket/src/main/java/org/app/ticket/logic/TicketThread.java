@@ -61,6 +61,17 @@ public class TicketThread extends Thread {
 			try {
 				// 查询火车信息
 				trainQueryInfoList = ClientCore.queryTrain(req);
+				if (trainQueryInfoList.size() == 0) {
+					mainWin.showMsg("请查看乘车日期是否输入正确!");
+					mainWin.isRunThread = false;
+					break;
+				}
+				// 判断是否到了放票时间点
+				if (ToolUtil.isSellPoint(trainQueryInfoList)) {
+					mainWin.showMsg("您所要求预定的城市还未到放票时间点!");
+					mainWin.isRunThread = false;
+					break;
+				}
 				mainWin.messageOut.setText(mainWin.messageOut.getText() + "火车信息\n");
 				if (trainQueryInfoList.size() > 0) {
 					for (TrainQueryInfo t : trainQueryInfoList) {
@@ -158,6 +169,7 @@ public class TicketThread extends Thread {
 				container.add(p_randcode);
 				container.add(p_confirm);
 				randcodeDialog.setVisible(true);
+				System.out.println("线程休眠时间为:" + ResManager.getByKey("sleeptime"));
 				// 休眠线程1S
 				sleep(Integer.parseInt(StringUtil.isEmptyString(ResManager.getByKey("sleeptime")) ? "1000" : ResManager.getByKey("sleeptime")));
 
@@ -165,5 +177,6 @@ public class TicketThread extends Thread {
 				e.printStackTrace();
 			}
 		}
+		mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
 	}
 }

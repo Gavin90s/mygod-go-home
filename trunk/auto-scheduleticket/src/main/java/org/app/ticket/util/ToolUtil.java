@@ -2,6 +2,10 @@ package org.app.ticket.util;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,6 +13,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -172,6 +178,37 @@ public class ToolUtil {
 		f = random.nextDouble();
 		url += f;
 		ClientCore.getPassCode(url, "F:\\image\\f_" + i + ".jpg");
+	}
+
+	/**
+	 * 判断是否到销售时间点
+	 * 
+	 * @param object
+	 * @return
+	 * @throws InvocationTargetException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws IntrospectionException
+	 */
+	public static boolean isSellPoint(Object obj) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, IntrospectionException {
+		boolean isSell = false;
+		List list = (List) obj;
+		for (int i = 0; i < list.size(); i++) {
+			// 将该javabean中的属性放入到BeanInfo中
+			BeanInfo bi = Introspector.getBeanInfo(list.get(i).getClass(), Object.class);
+			// 将每个属性的信息封装到一个PropertyDescriptor形成一个数组 其中包括属性名字，读写方法，属性的类型等等
+			PropertyDescriptor[] pds = bi.getPropertyDescriptors();
+			for (PropertyDescriptor pd : pds) {
+				Method getMethod = pd.getReadMethod();// 获得get方法
+				Object o = getMethod.invoke(list.get(i));// 执行get方法返回一个Object
+				isSell = StringUtil.isEqualString("*", String.valueOf(o));
+				if (isSell) {
+					break;
+				}
+			}
+		}
+
+		return isSell;
 	}
 
 	public static void main(String[] arg0) {
