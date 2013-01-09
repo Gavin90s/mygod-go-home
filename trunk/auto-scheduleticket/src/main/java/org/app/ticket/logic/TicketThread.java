@@ -25,6 +25,16 @@ import org.app.ticket.util.ToolUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * @Title: TicketThread.java
+ * @Description: 订票线程类
+ * @Package org.app.ticket.logic
+ * @author hncdyj123@163.com
+ * @date 2013-1-9
+ * @version V1.0
+ * 
+ */
 public class TicketThread extends Thread {
 
 	private static final Logger logger = LoggerFactory.getLogger(MainWin.class);
@@ -58,6 +68,12 @@ public class TicketThread extends Thread {
 		mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.stop"));
 		while (!isSuccess) {
 			mainWin.isRunThread = true;
+			if (mainWin.isStopRun) {
+				mainWin.showMsg("停止线程成功!");
+				mainWin.isStopRun = false;
+				mainWin.isRunThread = false;
+				break;
+			}
 			try {
 				// 查询火车信息
 				trainQueryInfoList = ClientCore.queryTrain(req);

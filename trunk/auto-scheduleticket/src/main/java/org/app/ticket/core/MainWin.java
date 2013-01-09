@@ -37,6 +37,7 @@ import org.app.ticket.bean.OrderRequest;
 import org.app.ticket.bean.TrainQueryInfo;
 import org.app.ticket.bean.UserInfo;
 import org.app.ticket.constants.Constants;
+import org.app.ticket.logic.KeepCookieThread;
 import org.app.ticket.logic.LoginThread;
 import org.app.ticket.logic.SubmitThread;
 import org.app.ticket.logic.TicketThread;
@@ -107,15 +108,22 @@ public class MainWin extends JFrame {
 	private List<UserInfo> userInfoList;
 	// 存放查询火车实体
 	private OrderRequest req;
-
+	// 项目根路径
 	public static String path;
+	// 类本身
 	private MainWin mainWin = null;
 	// 登录验证码路径
 	public String loginUrl;
+	// 提交订单验证码路径
 	public String submitUrl;
+	// 是否登录成功
 	public static boolean isLogin = false;
+	// 传入参数
 	private static String tessPath = null;
+	// 线程是否运行
 	public boolean isRunThread = false;
+	// 是否点击了停止按钮
+	public boolean isStopRun = false;
 
 	// 静态构造块
 	static {
@@ -625,7 +633,8 @@ public class MainWin extends JFrame {
 							mainWin.isLogin = true;
 							showMsg("导入session成功!");
 							messageOut.setText(messageOut.getText() + "本次一共为您筛选到" + trainQueryInfo.size() + "趟列车信息\n");
-							// autoGetTrainInfo = getAutoGetTrainInfo();
+							// 启动cookie保持线程
+							new KeepCookieThread().start();
 						} else {
 							showMsg("导入session失败,请仔细检查session!");
 						}
@@ -677,6 +686,9 @@ public class MainWin extends JFrame {
 				} else {
 					new TicketThread(userInfoList, req, mainWin).start();
 				}
+			}
+			if (ResManager.getString("RobotTicket.btn.stop").equals(btn.getText())) {
+				isStopRun = true;
 			}
 		}
 	}

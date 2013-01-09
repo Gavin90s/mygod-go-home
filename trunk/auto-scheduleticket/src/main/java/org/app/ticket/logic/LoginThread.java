@@ -59,11 +59,16 @@ public class LoginThread extends Thread {
 					islogin = true;
 					mainWin.isLogin = true;
 					mainWin.showMsg("登录成功！");
+					// 启动cookie保持线程
+					new KeepCookieThread().start();
 				} else {
 					mainWin.showMsg("登录失败,请仔细检查验证码！");
 				}
 			} else {
-				ClientCore.getCookie();
+				// 启动未获取到cookie的情况
+				if (StringUtil.isEmptyString(Constants.JSESSIONID_VALUE) && StringUtil.isEmptyString(Constants.BIGIPSERVEROTSWEB_VALUE)) {
+					ClientCore.getCookie();
+				}
 				while (!islogin) {
 					String url = Constants.GET_LOGINURL_PASSCODE + "&";
 					double f = 0.0000000000000001f;
@@ -113,6 +118,8 @@ public class LoginThread extends Thread {
 				logger.debug("在第" + sum + "次终于登录成功了！");
 				mainWin.messageOut.setText(mainWin.messageOut.getText() + "在第" + sum + "次终于登录成功了！\n");
 				mainWin.showMsg("登录成功！");
+				// 启动cookie保持线程
+				new KeepCookieThread().start();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
