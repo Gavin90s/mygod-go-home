@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class LoginThread extends Thread {
-	private static final Logger logger = LoggerFactory.getLogger(MainWin.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoginThread.class);
 
 	private MainWin mainWin;
 

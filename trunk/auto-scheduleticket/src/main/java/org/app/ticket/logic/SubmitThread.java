@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SubmitThread extends Thread {
 
-	private static final Logger logger = LoggerFactory.getLogger(MainWin.class);
+	private static final Logger logger = LoggerFactory.getLogger(SubmitThread.class);
 
 	private MainWin mainWin;
 

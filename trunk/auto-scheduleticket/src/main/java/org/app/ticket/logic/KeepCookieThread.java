@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class KeepCookieThread extends Thread {
-	private static final Logger logger = LoggerFactory.getLogger(ClientCore.class);
+	private static final Logger logger = LoggerFactory.getLogger(KeepCookieThread.class);
 
 	@SuppressWarnings("static-access")
 	@Override
@@ -27,7 +27,6 @@ public class KeepCookieThread extends Thread {
 				logger.debug("cookie Every time start time interval for " + Integer.parseInt(StringUtil.isEmptyString(ResManager.getByKey("keepcookietime")) ? "20" : ResManager.getByKey("keepcookietime")) + "min");
 				this.sleep(1000 * 60 * Integer.parseInt(StringUtil.isEmptyString(ResManager.getByKey("sleeptime")) ? "20" : ResManager.getByKey("keepcookietime")));
 				ClientCore.getCookie();
-				System.out.println("-----1");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

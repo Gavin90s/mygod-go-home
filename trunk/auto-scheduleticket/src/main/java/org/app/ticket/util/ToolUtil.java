@@ -181,7 +181,7 @@ public class ToolUtil {
 	}
 
 	/**
-	 * 判断是否到销售时间点
+	 * 判断是否到销售时间点(过滤高铁11点起售票)
 	 * 
 	 * @param object
 	 * @return
@@ -190,10 +190,10 @@ public class ToolUtil {
 	 * @throws IllegalArgumentException
 	 * @throws IntrospectionException
 	 */
-	public static boolean isSellPoint(Object obj) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, IntrospectionException {
+	public static List isSellPoint(Object obj) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, IntrospectionException {
 		boolean isSell = false;
 		List list = (List) obj;
-		for (int i = 0; i < list.size(); i++) {
+		for (int i = list.size() - 1; i >= 0; i--) {
 			// 将该javabean中的属性放入到BeanInfo中
 			BeanInfo bi = Introspector.getBeanInfo(list.get(i).getClass(), Object.class);
 			// 将每个属性的信息封装到一个PropertyDescriptor形成一个数组 其中包括属性名字，读写方法，属性的类型等等
@@ -203,12 +203,13 @@ public class ToolUtil {
 				Object o = getMethod.invoke(list.get(i));// 执行get方法返回一个Object
 				isSell = StringUtil.isEqualString("*", String.valueOf(o));
 				if (isSell) {
+					list.remove(i);
 					break;
 				}
 			}
 		}
 
-		return isSell;
+		return list;
 	}
 
 	public static void main(String[] arg0) {
