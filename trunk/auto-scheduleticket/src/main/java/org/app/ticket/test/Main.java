@@ -26,18 +26,5 @@ public class Main {
 
 		System.out.println("NEW = " + Constants.TOKEN + "\n" + Constants.LEFTTICKETSTR);
 
-		// // TODO 获取火车票数量
-		// List<UserInfo> userInfos = new ArrayList<UserInfo>();
-		// UserInfo userInfo = new UserInfo("430703199012266454", "杨杰",
-		// "13714389492");
-		// userInfos.add(userInfo);
-		//
-		// // 获取火车票数量
-		// ClientCore.getQueueCount(Constants.GET_URL_GETQUEUECOUNT, req,
-		// userInfos, trainQueryInfoList.get(1));
-
-		// SubmitThread sb = new SubmitThread(null,trainQueryInfoList,
-		// userInfos, req, null);
-		// sb.start();
 	}
 }
