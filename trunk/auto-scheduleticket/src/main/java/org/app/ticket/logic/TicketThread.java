@@ -173,7 +173,7 @@ public class TicketThread extends Thread {
 								mainWin.isRunThread = false;
 								mainWin.showMsg("订票成功!");
 								// 订票成功后输出cookie
-								mainWin.messageOut.setText("Cookie:[" + Constants.JSESSIONID + "=" + Constants.JSESSIONID_VALUE + ";" + Constants.BIGIPSERVEROTSWEB + "=" + Constants.BIGIPSERVEROTSWEB_VALUE + "]");
+								mainWin.messageOut.setText(mainWin.messageOut.getText() + "Cookie:[" + Constants.JSESSIONID + "=" + Constants.JSESSIONID_VALUE + ";" + Constants.BIGIPSERVEROTSWEB + "=" + Constants.BIGIPSERVEROTSWEB_VALUE + "]\n");
 								mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
 							}
 							randcodeDialog.setVisible(false);
