@@ -64,6 +64,8 @@ public class Constants {
 	// 无票状态的2种显示字符
 	public static final String SYS_TICKET_SIGN_1 = "--";
 	public static final String SYS_TICKET_SIGN_2 = "无";
+	// 配置文件中的用户名
+	public static final String SYS_USER_INFO = "userinfo";
 
 	/******************* 座位席别 ****************************/
 	public static String BUSS_SEAT = "9"; // 商务座

@@ -63,6 +63,8 @@ public class LoginThread extends Thread {
 					new KeepCookieThread().start();
 				} else {
 					mainWin.showMsg("登录失败,请仔细检查验证码！");
+					// 验证码错误 刷新验证码
+					mainWin.initLoginImage();
 				}
 			} else {
 				// 启动未获取到cookie的情况

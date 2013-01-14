@@ -53,6 +53,8 @@ public class TicketThread extends Thread {
 
 	private int sum = 0;
 
+	private int querySum = 0;
+
 	public TicketThread() {
 
 	}
@@ -66,6 +68,9 @@ public class TicketThread extends Thread {
 	@Override
 	public void run() {
 		mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.stop"));
+		if (userInfos.size() > 5) {
+			mainWin.showMsg("联系人不能大于5个!");
+		}
 		while (!isSuccess) {
 			mainWin.isRunThread = true;
 			if (mainWin.isStopRun) {
@@ -86,9 +91,15 @@ public class TicketThread extends Thread {
 				trainQueryInfoList = ToolUtil.isSellPoint(trainQueryInfoList);
 				// 判断是否到了放票时间点
 				if (trainQueryInfoList.size() == 0) {
-					mainWin.showMsg("您所要求预定的城市还未到放票时间点!");
-					mainWin.isRunThread = false;
-					break;
+					if (querySum < 1) {
+						mainWin.showMsg("您所要求预定的城市还未到放票时间点!");
+					}
+					querySum++;
+					// 休眠线程1S(避免频繁查询导致ip被封)
+					sleep(Integer.parseInt(StringUtil.isEmptyString(ResManager.getByKey("sleeptime")) ? "1000" : ResManager.getByKey("sleeptime")));
+					return;
+					// mainWin.isRunThread = false;
+					// break;
 				}
 				mainWin.messageOut.setText(mainWin.messageOut.getText() + "火车信息\n");
 				if (trainQueryInfoList.size() > 0) {

@@ -736,7 +736,44 @@ public class MainWin extends JFrame {
 				list.add(userInfo3);
 			}
 		}
-		userInfoList = list;
+		try {
+			userInfoList = getUserInfo(list);
+		} catch (IOException e) {
+			e.printStackTrace();
+			showMsg("配置文件中联系人解析错误,自动为您选择界面上的用户!");
+			userInfoList = list;
+			logger.error("解析配置中联系人错误,原因为:[" + e.getMessage() + "]");
+		}
+		return list;
+	}
+
+	/**
+	 * 获取配置文件中的联系人
+	 * 
+	 * @param list
+	 * @return
+	 * @throws IOException
+	 */
+	private List<UserInfo> getUserInfo(List<UserInfo> list) throws IOException {
+		// 获取配置文件中的联系人
+		String userString = ResManager.getByKey(Constants.SYS_USER_INFO);
+		if (!StringUtil.isEmptyString(userString)) {
+			String[] userList = userString.split("\\|");
+			if (userList.length > 0) {
+				for (int i = 0; i < userList.length; i++) {
+					String[] user = userList[i].split("\\,");
+					UserInfo userInfo = new UserInfo();
+					if (!StringUtil.isEmptyString(user[0]) && !StringUtil.isEmptyString(user[1])) {
+						userInfo.setName(user[0]);
+						userInfo.setCardID(user[1]);
+					}
+					if (!StringUtil.isEmptyString(user[2])) {
+						userInfo.setPhone(user[2]);
+					}
+					list.add(userInfo);
+				}
+			}
+		}
 		return list;
 	}
 
