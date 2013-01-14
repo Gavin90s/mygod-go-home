@@ -169,7 +169,8 @@ public class MainWin extends JFrame {
 			public void windowClosing(WindowEvent e) {
 				// 保存用户实体
 				try {
-					ToolUtil.getUserInfo(path, "UI.dat", username, password, linkman1_name, linkman1_cardNo, linkman1_mobile, linkman2_name, linkman2_cardNo, linkman2_mobile, linkman3_name, linkman3_cardNo, linkman3_mobile);
+					ToolUtil.getUserInfo(path, "UI.dat", username, password, linkman1_name, linkman1_cardNo, linkman1_mobile, linkman2_name, linkman2_cardNo, linkman2_mobile, linkman3_name,
+							linkman3_cardNo, linkman3_mobile);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -531,7 +532,8 @@ public class MainWin extends JFrame {
 		initLoginImage();
 		this.mainWin = this;
 		try {
-			ToolUtil.setUserInfo(path, "UI.dat", username, password, linkman1_cardNo, linkman1_name, linkman1_mobile, linkman2_cardNo, linkman2_name, linkman2_mobile, linkman3_cardNo, linkman3_name, linkman3_mobile);
+			ToolUtil.setUserInfo(path, "UI.dat", username, password, linkman1_cardNo, linkman1_name, linkman1_mobile, linkman2_cardNo, linkman2_name, linkman2_mobile, linkman3_cardNo, linkman3_name,
+					linkman3_mobile);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("初始化界面赋值失败！");
@@ -767,8 +769,13 @@ public class MainWin extends JFrame {
 						userInfo.setName(user[0]);
 						userInfo.setCardID(user[1]);
 					}
-					if (!StringUtil.isEmptyString(user[2])) {
-						userInfo.setPhone(user[2]);
+					try {
+						if (!StringUtil.isEmptyString(user[2])) {
+							userInfo.setPhone(user[2]);
+						}
+					} catch (Exception e) {
+						logger.error("数组越界!");
+						userInfo.setPhone(null);
 					}
 					list.add(userInfo);
 				}
