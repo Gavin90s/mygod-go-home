@@ -94,10 +94,10 @@ public class TicketThread extends Thread {
 					if (querySum < 1) {
 						mainWin.showMsg("您所要求预定的城市还未到放票时间点!");
 					}
-					querySum++;
+					mainWin.messageOut.setText(mainWin.messageOut.getText() + "第" + (++querySum) + "次查询时间点无票!\n");
 					// 休眠线程1S(避免频繁查询导致ip被封)
 					sleep(Integer.parseInt(StringUtil.isEmptyString(ResManager.getByKey("sleeptime")) ? "1000" : ResManager.getByKey("sleeptime")));
-					return;
+					continue;
 					// mainWin.isRunThread = false;
 					// break;
 				}
@@ -184,7 +184,8 @@ public class TicketThread extends Thread {
 								mainWin.isRunThread = false;
 								mainWin.showMsg("订票成功!");
 								// 订票成功后输出cookie
-								mainWin.messageOut.setText(mainWin.messageOut.getText() + "Cookie:[" + Constants.JSESSIONID + "=" + Constants.JSESSIONID_VALUE + ";" + Constants.BIGIPSERVEROTSWEB + "=" + Constants.BIGIPSERVEROTSWEB_VALUE + "]\n");
+								mainWin.messageOut.setText(mainWin.messageOut.getText() + "Cookie:[" + Constants.JSESSIONID + "=" + Constants.JSESSIONID_VALUE + ";" + Constants.BIGIPSERVEROTSWEB
+										+ "=" + Constants.BIGIPSERVEROTSWEB_VALUE + "]\n");
 								mainWin.getStartButton().setText(ResManager.getString("RobotTicket.btn.start"));
 							}
 							randcodeDialog.setVisible(false);
